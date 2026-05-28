@@ -39,7 +39,8 @@ MIPS는 안정적인 사용자 인증을 기반으로 미국 주식, ETF 정보 
 - [x] Vite + TypeScript + React 프로젝트 초기 아키텍처 환경 세팅
 - [x] UI 컴포넌트(Header, 기본적인 페이지 라우팅 및 레이아웃) 구조화
 - [x] 로그인(Login) 및 주식 정보 조회(UsStock) 페이지 마크업 및 타입 정의
-- [ ] JWT 및 OAuth2 기반 로그인 상태 연동 및 네비게이션 바 동적 렌더링 (Google, Kakao)
+- [x] JWT 및 OAuth2 기반 로그인 상태 연동 및 네비게이션 바 동적 렌더링 (Google, Kakao)
+- [ ] 회원가입 화면 구현
 - [ ] 포트원(Portone) SDK 연동을 통한 가상결제 및 예수금 충전 UI 구현 
 - [ ] 주식 상세 페이지 내 실시간 호가 반영 및 매수/매도 주문 유효성 검사 기능 
 
@@ -47,7 +48,8 @@ MIPS는 안정적인 사용자 인증을 기반으로 미국 주식, ETF 정보 
 - [x] Spring Boot + Gradle 멀티 모듈 프로젝트 구조 설계
 - [x] 핵심 도메인 엔티티(AccountBalance, TradeOrder, Stock, User) 모델링 및 JPA 매핑
 - [x] 인증/인가를 위한 Spring Security 및 JWT 발급/검증 로직 구현
-- [x] 로컬 n8n을 이용한 Finnhub 사의 미국 주식 API 조회 
+- [x] 로컬 n8n을 이용한 Finnhub 사의 미국 주식 API 조회
+- [ ] 회원가입 및 로그인 처리 로직 구현
 - [ ] 가상 결제 완료 정보 수신 및 계좌 잔액(AccountBalance) 갱신 API 개발
 - [ ] 동시성 이슈를 고려한 주식 주문(TradeOrder) 체결 및 트랜잭션 처리 로직 구현
 
