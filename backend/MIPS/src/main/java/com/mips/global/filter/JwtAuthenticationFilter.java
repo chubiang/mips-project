@@ -26,6 +26,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+
+        // oauth2 로그인 시작 주소와 로그인 성공 코드를 보내는 콜백 주소는 JWT 검사를 하지 않습니다.
+        return path.startsWith("/oauth2/authorization/") || path.startsWith("/login/oauth2/code/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {

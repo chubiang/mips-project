@@ -51,6 +51,7 @@ public class SecurityConfig {
                                     "/login",
                                     "/oauth2/**",
                                     "/login/oauth2/code/google",
+                                    "/login/oauth2/code/kakao",
                                     "/favicon.ico",
                                     "/error",
                                     "/api/login",

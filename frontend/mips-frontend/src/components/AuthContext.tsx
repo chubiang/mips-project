@@ -12,16 +12,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) setIsLoggedIn(true);
+    else {
+      logout(); // 혹시 모를 이상한 상태 방지 위해 로그아웃 처리
+    }
   }, []);
 
   // ★ 핵심! 로그인 함수: 토큰 저장 + 리액트 상태 변경을 동시에 쾅!
   const login = (token: string) => {
+    console.log('AuthProvider: 로그인 처리 중, 받은 토큰 ->', token); // 디버깅용 로그
     localStorage.setItem('accessToken', token);
     setIsLoggedIn(true); // 이 State가 변하면서 네비바가 휙! 바뀝니다.
   };
 
   // 로그아웃 함수
   const logout = () => {
+    console.log('AuthProvider: 로그아웃 처리 중'); // 디버깅용 로그
     localStorage.removeItem('accessToken');
     setIsLoggedIn(false);
   };
