@@ -3,5 +3,14 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "target": "ESNext",      // 최신 자바스크립트 문법 허용
+    "module": "ESNext",      // import.meta.url을 쓰기 위해 필요
+    "lib": [
+      "DOM",                 // DOM API (Worker 포함) 인식
+      "DOM.Iterable",
+      "ESNext"
+    ]
+  }
 }

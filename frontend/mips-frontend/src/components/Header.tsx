@@ -1,16 +1,12 @@
 // src/components/Header.tsx
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { LayoutDashboard, TrendingUp, Wallet, LogIn, LogOut } from 'lucide-react'
-
 import { useAuth } from '@/components/AuthContext'
 
 export default function Header() {
-  const navigate = useNavigate()
   const { isLoggedIn, logout } = useAuth()
-
   const handleLogout = () => {
-    logout()
-    navigate('/')
+    logout() // AuthContext의 로그아웃 함수 호출
   }
 
 

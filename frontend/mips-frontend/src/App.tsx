@@ -3,22 +3,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import UsStock from "@/pages/UsStock"
 import Login from "@/pages/Login"
 import Header from "@/components/Header"
+import Dashboard from "@/pages/Dashboard"
 import { AuthProvider } from '@/components/AuthContext'
-import OAuth2RedirectHandler from "@/components/OAuth2RedirectHandler"
 
 // ----------------------------------------------------
 // 임시 페이지 컴포넌트들 (나중에 src/pages 폴더로 분리할 예정입니다)
 // ----------------------------------------------------
-function Home() {
-  return (
-    <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-      <OAuth2RedirectHandler /> {/* ★ 로그인 처리 컴포넌트 삽입 */}
-      <h1 className="text-2xl font-bold text-slate-800 mb-2">환영합니다! MIPS 플랫폼입니다.</h1>
-      <p className="text-slate-500">결제/정산 및 AI 기반 모의 투자 프론트엔드가 시작되었습니다.</p>
-    </div>
-  )
-}
-
 function Market() {
   return (
     <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
@@ -74,7 +64,7 @@ function App() {
         {/* 메인 콘텐츠 영역 */}
         <main className="max-w-7xl mx-auto px-4 py-8">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/market" element={<Market />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/us-stock" element={<UsStock />} />

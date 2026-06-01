@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -41,7 +42,8 @@ public class SecurityConfig {
             // 1. CSRF 방어 기능 끄기 : 세션 미사용
             .csrf(AbstractHttpConfigurer::disable)
             // 2. CORS 설정 적용 (리액트 5173 포트 허용)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(Customizer.withDefaults())
             // 3. 세션 관리 상태를 'STATELESS'로 설정 (서버가 세션을 기억하지 않음, 나중에 JWT 쓸 때 필수)
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -56,6 +58,7 @@ public class SecurityConfig {
                                     "/error",
                                     "/api/login",
                                     "/api/signup",
+                                    "/api/auth/refresh",
                                     "/api/stock/**").permitAll()
                     .requestMatchers("/api/user/**", "/api/order/**","/api/pay/**").authenticated()
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")  // 관리자 전용

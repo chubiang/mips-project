@@ -8,8 +8,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Base64;
 import java.util.Date;
+
 
 @Slf4j
 @Component
@@ -48,6 +61,23 @@ public class JwtProvider {
                 .expiration(new Date(System.currentTimeMillis() + refreshExpirationTime))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public LocalDateTime getExpirationFromToken(String token) {
+        // 🌟 최신 버전 공식 빌드 마이그레이션 적용
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)           // 1. setSigningKey -> verifyWith 로 변경 (key 객체 그대로 대입)
+                .build()
+                .parseSignedClaims(token)  // 2. parseClaimsJws -> parseSignedClaims 로 변경
+                .getPayload();             // 3. getBody -> getPayload 로 변경
+
+        // 4. 만료 시간(exp) 추출
+        Date expirationDate = claims.getExpiration();
+
+        // 5. Date -> LocalDateTime 변환
+        return expirationDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
     }
 
     // 진짜 유효한 토큰인지 확인
@@ -101,5 +131,12 @@ public class JwtProvider {
                 .getPayload();
 
         return claims.get("role", String.class);
+    }
+
+    public String hmacSha256(String token) throws InvalidKeyException, NoSuchAlgorithmException {
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(secretKey);
+        byte[] hmac = mac.doFinal(token.getBytes(StandardCharsets.UTF_8));
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(hmac);
     }
 }
