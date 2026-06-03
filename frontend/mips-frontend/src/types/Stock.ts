@@ -7,7 +7,7 @@ export interface UsTopStock {
   companyName: string
   assetType: AssetType
   sector: string
-  status: string       // "true" | "false"
+  status: 'true' | 'false'
   price: number
   changeAmount: number // 전일 대비 변화 금액
   changeRate: number   // 전일 대비 변화율 (%)

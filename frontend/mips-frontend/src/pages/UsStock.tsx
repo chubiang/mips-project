@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, type ChangeEvent } from 'react'
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Clock, AlertCircle } from 'lucide-react'
 import { fetchAllUsStock } from '@/api/stockApi'
 import type {
@@ -8,6 +8,36 @@ import type {
   SortField,
   AssetType,
 } from '@/types/Stock'
+
+// ---------------------------------------------------------------------------
+// Props 타입 정의
+// ---------------------------------------------------------------------------
+interface AssetTypeBadgeProps {
+  type: AssetType
+}
+
+interface SortIconProps {
+  field: SortField
+  sort: StockSort
+}
+
+interface SortableHeaderProps {
+  label: string
+  field: SortField
+  sort: StockSort
+  onSort: (f: SortField) => void
+  className?: string
+}
+
+interface StockRowProps {
+  stock: UsTopStock
+  index: number
+}
+
+type FilterButton = {
+  label: string
+  value: StockFilter['assetType']
+}
 
 // ---------------------------------------------------------------------------
 // 유틸 함수
@@ -26,7 +56,7 @@ function formatUpdatedAt(iso: string) {
 // ---------------------------------------------------------------------------
 // 서브 컴포넌트
 // ---------------------------------------------------------------------------
-function AssetTypeBadge({ type }: { type: AssetType }) {
+function AssetTypeBadge({ type }: AssetTypeBadgeProps) {
   const styles: Record<AssetType, string> = {
     STOCK: 'bg-blue-100 text-blue-600',
     ETF:   'bg-green-100 text-green-700',
@@ -40,7 +70,7 @@ function AssetTypeBadge({ type }: { type: AssetType }) {
   )
 }
 
-function SortIcon({ field, sort }: { field: SortField; sort: StockSort }) {
+function SortIcon({ field, sort }: SortIconProps) {
   if (sort.field !== field) return <ChevronsUpDown size={14} className="text-slate-400" />
   return sort.order === 'asc'
     ? <ChevronUp size={14} className="text-blue-600" />
@@ -49,13 +79,7 @@ function SortIcon({ field, sort }: { field: SortField; sort: StockSort }) {
 
 function SortableHeader({
   label, field, sort, onSort, className = '',
-}: {
-  label: string
-  field: SortField
-  sort: StockSort
-  onSort: (f: SortField) => void
-  className?: string
-}) {
+}: SortableHeaderProps) {
   return (
     <th
       className={`px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide cursor-pointer select-none hover:bg-slate-100 transition-colors ${className}`}
@@ -118,7 +142,7 @@ export default function UsStock() {
     }))
   }
 
-  const filterButtons: { label: string; value: StockFilter['assetType'] }[] = [
+  const filterButtons: FilterButton[] = [
     { label: '전체',  value: 'ALL' },
     { label: '주식',  value: 'STOCK' },
     { label: 'ETF',   value: 'ETF' },
@@ -150,7 +174,7 @@ export default function UsStock() {
             type="text"
             placeholder="종목명 또는 종목코드 검색 (예: AAPL, Apple)"
             value={filter.search}
-            onChange={e => setFilter(prev => ({ ...prev, search: e.target.value }))}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFilter(prev => ({ ...prev, search: e.target.value }))}
             className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -240,7 +264,7 @@ export default function UsStock() {
   )
 }
 
-function StockRow({ stock, index }: { stock: UsTopStock; index: number }) {
+function StockRow({ stock, index }: StockRowProps) {
   const isPositive = stock.changeAmount >= 0
   const changeColor = isPositive ? 'text-green-600' : 'text-red-500'
   const changeSign  = isPositive ? '+' : ''

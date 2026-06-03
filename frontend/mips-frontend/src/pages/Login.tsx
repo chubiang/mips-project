@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, type FormEvent, type ChangeEvent } from 'react'
 import { TrendingUp } from 'lucide-react'
 import type { FormLogin } from '@/types/FormLogin'
-import { handleGoogleLogin, handleKakaoLogin } from '@/api/userApi' 
+import type { LoginResponse } from '@/types'
+import { handleGoogleLogin, handleKakaoLogin } from '@/api/userApi'
 import axios from 'axios'
 
 function GoogleIcon() {
@@ -34,7 +35,7 @@ export default function Login() {
     password: '',
   })
 
-  async function handleLogin(e: { preventDefault(): void }) {
+  async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!formData.email || !formData.password) {
       setError('이메일과 비밀번호를 모두 입력해주세요.')
@@ -43,7 +44,7 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      await axios.post('/api/login', { email: formData.email, password: formData.password })
+      await axios.post<LoginResponse>('/api/login', { email: formData.email, password: formData.password })
       // TODO: 로그인 성공 후 처리 (토큰 저장, 리다이렉션 등)
     } catch {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.')
@@ -96,14 +97,14 @@ export default function Login() {
               type="text"
               placeholder="이메일"
               value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <input
               type="password"
               placeholder="비밀번호"
               value={formData.password}
-              onChange={e => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, password: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
 

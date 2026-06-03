@@ -1,5 +1,10 @@
 // src/types/index.ts
 
+// 0. 로그인 응답 타입
+export interface LoginResponse {
+  accessToken: string
+}
+
 // 1. 공통 API 응답 타입 (Spring Boot가 내려줄 응답 형태와 맞춥니다)
 export interface ApiResponse<T> {
   success: boolean
