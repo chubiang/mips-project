@@ -1,10 +1,12 @@
 // src/App.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import UsStock from "@/pages/UsStock"
 import Login from "@/pages/Login"
+import Signup from "./pages/Signup"
 import Header from "@/components/Header"
 import Dashboard from "@/pages/Dashboard"
+import UsStock from "@/pages/UsStock"
 import { AuthProvider } from '@/components/AuthContext'
+
 
 // ----------------------------------------------------
 // 임시 페이지 컴포넌트들 (나중에 src/pages 폴더로 분리할 예정입니다)
@@ -68,6 +70,7 @@ function App() {
             <Route path="/market" element={<Market />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/us-stock" element={<UsStock />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
           </Routes>
         </main>

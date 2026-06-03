@@ -60,8 +60,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = (): void => {
     console.log('AuthProvider: 로그아웃 처리 중')
-    handleLogout()
-    setIsLoggedIn(false)
+    setIsLoggedIn(false)   // UI 즉시 반영
+    void handleLogout()    // 토큰 정리 + 페이지 이동 (async, 완료 후 이동)
   }
 
   return (

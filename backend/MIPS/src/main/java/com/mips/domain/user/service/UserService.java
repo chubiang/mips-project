@@ -1,5 +1,7 @@
 package com.mips.domain.user.service;
 
+import com.mips.domain.user.dto.SignupRequuest;
+import com.mips.domain.user.dto.SignupResponse;
 import com.mips.domain.user.entity.RefreshToken;
 import com.mips.domain.user.enums.TokenStatus;
 import com.mips.domain.user.repository.RefreshTokenRepository;
@@ -58,6 +60,12 @@ public class UserService {
         String newAccessToken = jwtProvider.createAccessToken(email, role);
         log.info("newAccessToken {}", newAccessToken);
         return Map.of("accessToken", newAccessToken);
+    }
+
+    public SignupResponse signup(SignupRequuest signup)
+    {
+        
+        return null;
     }
 
     /*

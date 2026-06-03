@@ -84,6 +84,15 @@ public class SecurityConfig {
             )
             // FINAL: 폼 로그인, Basic Http 로그인 비활성화 (리액트가 화면을 알아서 그리므로)
             .formLogin(form -> form.disable())
+            .logout(logout -> logout
+                    .logoutUrl("/api/auth/logout")
+                    .invalidateHttpSession(true)
+                    .clearAuthentication(true)
+                    .deleteCookies("refresh_token")
+                    .logoutSuccessHandler((request, response, authentication) -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                    })
+            )
             .httpBasic(basic -> basic.disable());
             // ADD: JWT 필터를 추가
             http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

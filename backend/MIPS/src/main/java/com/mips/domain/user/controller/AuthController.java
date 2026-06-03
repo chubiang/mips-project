@@ -38,7 +38,6 @@ public class AuthController {
             throw new RuntimeException(e);
         }
     }
-
     // 쿠키 추출용
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();

@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ChangeEvent } from 'react'
 import { TrendingUp } from 'lucide-react'
-import type { FormLogin } from '@/types/FormLogin'
+import type { LoginForm } from '@/types/LoginForm'
 import type { LoginResponse } from '@/types'
 import { handleGoogleLogin, handleKakaoLogin } from '@/api/userApi'
 import axios from 'axios'
@@ -30,7 +30,7 @@ function KakaoIcon() {
 export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [formData, setFormData] = useState<FormLogin>({
+  const [formData, setFormData] = useState<LoginForm>({
     email: '',
     password: '',
   })
