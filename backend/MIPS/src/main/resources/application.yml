@@ -1,7 +1,7 @@
 app:
   oauth2:
-    authorized-redirect-uri: http://localhost:5173/
-    failed-redirect-uri: http://localhost:5173/login?error=oauth2
+    authorized-redirect-uri: ""
+    failed-redirect-uri: ""
 server:
   port: 8082
 spring:
@@ -10,15 +10,15 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ""
+            client-secret: ""
             scope:
               - email
               - profile
           kakao:
-            client-id: ${KAKAO_CLIENT_ID}
-            client-secret: ${KAKAO_CLIENT_SECRET}
-            redirect-uri: ${KAKAO_REDIRECT-URI}
+            client-id: ""
+            client-secret: ""
+            redirect-uri: ""
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
             client-name: Kakao
@@ -31,9 +31,9 @@ spring:
       port: 6379
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=finance
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
+    url: ""
+    username: ""
+    password: ""
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -48,12 +48,12 @@ spring:
   application:
     name: MIPS
 jwt:
-  secret-key: ${JWT_SECRET-KEY}
+  secret-key: ""
   access-expiration-time: 1800000  # 30분 (30 * 60 * 1000)
   refresh-expiration-time: 604800000 # 7일 (7 * 24 * 60 * 60 * 1000)
 Jasypt:
   encryptor:
-    password: ${Jasypt.encryptor.password}
+    password: ""
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
