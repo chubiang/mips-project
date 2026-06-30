@@ -5,6 +5,9 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "target": "ESNext",      // 최신 자바스크립트 문법 허용
     "module": "ESNext",      // import.meta.url을 쓰기 위해 필요
     "lib": [

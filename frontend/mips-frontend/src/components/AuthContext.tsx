@@ -1,13 +1,9 @@
-import { createContext, useState, useEffect, useRef, type ReactNode, useContext } from 'react'
-import type { AuthContextType } from '@/types/AuthContextType'
-import { fetchViaWorker, setTokenToWorker } from '@/api/apiClient'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { fetchViaWorker, setTokenToWorker } from '@/api/authWorkerClient'
+import { AuthContext } from '@/contexts/AuthContext'
 import { handleLogout } from '@/api/userApi'
+import type { ApiResponse } from '@/types/Comm'
 
-interface RefreshTokenResponse {
-  accessToken: string
-}
-
-const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
@@ -27,8 +23,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         })
 
         if (response.ok) {
-          const data: RefreshTokenResponse = await response.json()
-          await setTokenToWorker(data.accessToken)
+          const resdata: ApiResponse<Response> = await response.json()
+          console.log("silentRefresh",response, resdata)
+          await setTokenToWorker(resdata.data.token)
           setIsLoggedIn(true)
           console.log("새로고침 방어 성공! 토큰 복구됨")
         } else {
@@ -69,11 +66,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AuthContext.Provider>
   )
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error("useAuth는 AuthProvider 안에서 써야해요!")
-  return context
 }

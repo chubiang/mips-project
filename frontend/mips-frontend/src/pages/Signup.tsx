@@ -3,7 +3,7 @@ import { useState, type FormEvent, type ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { TrendingUp } from 'lucide-react'
 import { handleSignup } from '@/api/userApi'
-import type { SignupForm, SignupFieldError, SignupRequest } from '@/types/SignupForm'
+import type { SignupForm, SignupFieldError, SignupRequest } from '@/types/User'
 
 const INITIAL_FORM: SignupForm = {
   email: '',

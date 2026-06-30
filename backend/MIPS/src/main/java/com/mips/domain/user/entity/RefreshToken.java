@@ -31,7 +31,7 @@ public class RefreshToken {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false, length = 512)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String token;
 
     @Enumerated(EnumType.STRING)
@@ -53,7 +53,6 @@ public class RefreshToken {
     public RefreshToken(String email, String token, LocalDateTime expiresAt) {
         this.email = email;
         this.token = token;
-        this.status = TokenStatus.ACTIVE;
         this.expiresAt = expiresAt;
     }
 

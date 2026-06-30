@@ -1,12 +1,13 @@
-import { setTokenToWorker } from '@/api/apiClient'
-import type { SignupRequest } from '@/types/SignupForm'
+import { setTokenToWorker, fetchViaWorker } from '@/api/authWorkerClient'
+import type { ApiResponse } from '@/types/Comm'
+import type { SignupRequest, UserInfo } from '@/types/User'
 
 export const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8082/oauth2/authorization/google';
+    window.location.href = 'http://localhost:8082/oauth2/authorization/google'
 };
 
 export const handleKakaoLogin = () => {
-    window.location.href = 'http://localhost:8082/oauth2/authorization/kakao';
+    window.location.href = 'http://localhost:8082/oauth2/authorization/kakao'
 };
 
 export const handleLogout = async (): Promise<void> => {
@@ -30,7 +31,7 @@ export const handleLogout = async (): Promise<void> => {
     window.location.href = '/'
 };
 
-export async function handleSignup(data: SignupRequest) {
+export async function handleSignup(data: SignupRequest): Promise<ApiResponse<string>> {
   const response = await fetch("http://localhost:8082/api/auth/signup", {
     method: "POST",
     headers: {
@@ -40,9 +41,31 @@ export async function handleSignup(data: SignupRequest) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json()
     throw new Error(error.message ?? "회원가입에 실패했습니다.");
   }
 
-  return response.json();
+  return response.json()
+}
+
+export async function handleAuthToken(): Promise<UserInfo | null> {
+  const response = await fetchViaWorker('/api/auth/refresh-user', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+
+  if (response?.data) {
+    return {
+      email: response.data.email,
+      role: response.data.role,
+      nickname: response.data.nickname,
+      phone: response.data.phone,
+    }
+  }
+
+  return null
+
 }

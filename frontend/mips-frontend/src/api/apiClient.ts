@@ -6,44 +6,6 @@ import type {
     AxiosResponse 
 } from 'axios';
 
-// 싱글톤으로 워커 인스턴스 생성
-const authWorker = new Worker(new URL('../workers/authWorker.ts', import.meta.url), {
-    type: 'module',
-});
-
-// 비동기 통신을 위해 요청 ID별로 Promise의 resolve/reject를 저장할 맵
-const pendingRequests = new Map();
-
-authWorker.addEventListener('message', (event) => {
-    const { type, id, data, error } = event.data;
-    const promiseHandlers = pendingRequests.get(id);
-
-    if (promiseHandlers) {
-        if (type === 'API_SUCCESS' || type === 'TOKEN_SET' || type === 'LOGGED_OUT') {
-            promiseHandlers.resolve(data);
-        } else if (type === 'API_ERROR') {
-            promiseHandlers.reject(error);
-        }
-        pendingRequests.delete(id); // 처리 완료 후 메모리 정리
-    }
-});
-
-export const setTokenToWorker = (token: string) => {
-    return new Promise((resolve) => {
-        const id = Date.now().toString();
-        pendingRequests.set(id, { resolve });
-        authWorker.postMessage({ type: 'SET_TOKEN', payload: { token }, id });
-    });
-};
-
-export const fetchViaWorker = (url: string, options?: RequestInit) => {
-    return new Promise((resolve, reject) => {
-        const id = crypto.randomUUID(); // 고유 ID 부여
-        pendingRequests.set(id, { resolve, reject });
-        authWorker.postMessage({ type: 'API_REQUEST', payload: { url, options }, id });
-    });
-};
-
 // 1. 공통 Axios 인스턴스 생성
 const apiClient: AxiosInstance = axios.create({
     baseURL: 'http://localhost:8082', // 백엔드 기본 주소

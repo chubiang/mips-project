@@ -3,8 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Login from "@/pages/Login"
 import Signup from "./pages/Signup"
 import Header from "@/components/Header"
+import AboutMe from "@/pages/AboutMe"
 import Dashboard from "@/pages/Dashboard"
 import UsStock from "@/pages/UsStock"
+import AssetMng from "@/pages/AssetMng"
 import { AuthProvider } from '@/components/AuthContext'
 
 
@@ -30,30 +32,6 @@ function Market() {
   )
 }
 
-function Portfolio() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-t-4 border-t-blue-600">
-        <h2 className="text-lg font-bold text-slate-700 mb-4">💰 내 계좌 잔고</h2>
-        <div className="space-y-3">
-          <div className="flex justify-between text-slate-600 border-b pb-2">
-            <span>주문 가능 현금</span>
-            <span className="font-bold text-blue-600">10,000.00 USD</span>
-          </div>
-          <div className="flex justify-between text-slate-600">
-            <span>결제 묶임 금액</span>
-            <span className="font-bold text-red-500">0.00 USD</span>
-          </div>
-        </div>
-      </div>
-      <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 className="text-lg font-bold text-slate-700 mb-4">💼 보유 종목</h2>
-        <p className="text-slate-500 text-center py-10 bg-slate-50 rounded-lg border border-dashed">보유 중인 주식이 없습니다.</p>
-      </div>
-    </div>
-  )
-}
-
 // ----------------------------------------------------
 // 앱 메인 네비게이션 및 라우팅 설정
 // ----------------------------------------------------
@@ -66,9 +44,10 @@ function App() {
         {/* 메인 콘텐츠 영역 */}
         <main className="max-w-7xl mx-auto px-4 py-8">
           <Routes>
+            <Route path="/about-me" element={<AboutMe />} />
             <Route path="/" element={<Dashboard />} />
             <Route path="/market" element={<Market />} />
-            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/asset-mng" element={<AssetMng/>} />
             <Route path="/us-stock" element={<UsStock />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />

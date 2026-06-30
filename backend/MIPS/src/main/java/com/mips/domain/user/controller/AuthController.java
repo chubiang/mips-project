@@ -1,5 +1,6 @@
 package com.mips.domain.user.controller;
 
+import com.mips.domain.comm.dto.ApiResponse;
 import com.mips.domain.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class AuthController {
             String refreshToken = extractRefreshTokenFromCookie(request);
 
             Map<String, Object> accessTokenMap =  userService.createAccessToken(refreshToken);
-            return ResponseEntity.ok(accessTokenMap);
+            return ResponseEntity.ok(ApiResponse.success(accessTokenMap));
         }
         catch (IllegalArgumentException e)
         {
@@ -38,6 +39,22 @@ public class AuthController {
             throw new RuntimeException(e);
         }
     }
+
+    @PostMapping("/refresh-user")
+    public ResponseEntity<?> getUserInfo(HttpServletRequest request) {
+        try {
+            // refresh_token 찾기
+            String refreshToken = extractRefreshTokenFromCookie(request);
+
+            Map<String, Object> accessTokenMap =  userService.getUserInfo(refreshToken);
+            return ResponseEntity.ok(ApiResponse.success(accessTokenMap));
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
     // 쿠키 추출용
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();

@@ -1,7 +1,6 @@
 import { useState, type FormEvent, type ChangeEvent } from 'react'
 import { TrendingUp } from 'lucide-react'
-import type { LoginForm } from '@/types/LoginForm'
-import type { LoginResponse } from '@/types'
+import type { LoginForm, LoginResponse } from '@/types/User'
 import { handleGoogleLogin, handleKakaoLogin } from '@/api/userApi'
 import axios from 'axios'
 

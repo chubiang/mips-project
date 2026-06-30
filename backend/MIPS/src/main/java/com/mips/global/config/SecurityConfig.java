@@ -1,6 +1,6 @@
 package com.mips.global.config;
 
-import com.mips.global.component.OAuth2SuccessHandler;
+import com.mips.global.handler.OAuth2SuccessHandler;
 import com.mips.global.filter.JwtAuthenticationFilter;
 import com.mips.global.service.CustomOAuth2UserService;
 
@@ -59,7 +59,9 @@ public class SecurityConfig {
                                     "/api/login",
                                     "/api/signup",
                                     "/api/auth/refresh",
-                                    "/api/stock/**").permitAll()
+                                    "/api/auth/refresh-user",
+                                    "/api/stock/**",
+                                    "/api/payments/webhook").permitAll()
                     .requestMatchers("/api/user/**", "/api/order/**","/api/pay/**").authenticated()
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")  // 관리자 전용
                     .anyRequest().authenticated() // 그 외 나머지 요청은 인증(로그인) 필요

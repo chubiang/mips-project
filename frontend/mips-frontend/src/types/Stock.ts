@@ -30,3 +30,13 @@ export interface StockFilter {
   search: string
   assetType: AssetType | 'ALL'
 }
+
+// 2. 주식 및 ETF 정보
+export interface Stock {
+  ticker: string
+  companyName: string
+  market: string
+  assetType: number // 1:INDEX, 2:STOCK, 3:ETF
+  hasComponents: boolean
+  status: string
+}

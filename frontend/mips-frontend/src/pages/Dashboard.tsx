@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
-import { setTokenToWorker, fetchViaWorker } from '@/api/apiClient';
+import { useEffect } from 'react';
+import { setTokenToWorker } from '@/api/authWorkerClient';
 // import OAuth2RedirectHandler from "@/components/OAuth2RedirectHandler"; // ★ 로그인 처리 컴포넌트
 
 export default function Dashboard() {
-    const [userData, setUserData] = useState(null);
 
     // 1. 카카오 로그인 리다이렉트 성공 시 처리
     useEffect(() => {

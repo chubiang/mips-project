@@ -30,7 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // oauth2 로그인 시작 주소와 로그인 성공 코드를 보내는 콜백 주소는 JWT 검사를 하지 않습니다.
-        return path.startsWith("/oauth2/authorization/") || path.startsWith("/login/oauth2/code/");
+        return path.startsWith("/oauth2/authorization/") || path.startsWith("/login/oauth2/code/")
+                || path.startsWith("/api/auth/refresh") || path.startsWith("/api/auth/refresh-user");
     }
 
     @Override
@@ -40,12 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 1. HTTP 헤더에서 토큰 꺼내기
         String token = resolveToken(request);
         log.info("token: {}",token);
-        // 2. 토큰이 존재하고, 유효한지 검사
-        if (token != null && jwtProvider.validateToken(token)) {
+        // 2. 토큰이 존재하고, 리프레시 토큰이 아닌 경우, 유효한지 검사
+        if (token != null && jwtProvider.validateToken(token) && !jwtProvider.isRefreshToken(token)) {
             // 3. 토큰에서 유저 정보(이메일, 권한) 추출
             String email = jwtProvider.getEmailFromToken(token);
             String role = jwtProvider.getRoleFromToken(token);
             log.info("email: {} / role: {}",email, role);
+
             // 4. Spring Security가 이해할 수 있는 인증 객체(Authentication) 생성
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     email,

@@ -45,6 +45,8 @@ public class JwtProvider {
     public String createAccessToken(String email, String role) {
         return Jwts.builder()
                 .subject(email)
+                .claim("type", "access")
+                .claim("email", email)
                 .claim("role", role) // 화면을 위해 권한 정보 탑재
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessExpirationTime))
@@ -53,11 +55,13 @@ public class JwtProvider {
     }
 
     // 2. 🔵 Refresh Token 생성 (수명: 14일) - 출입증 만료 시 갱신용으로만 씀
-    public String createRefreshToken(String userId) {
+    public String createRefreshToken(String email) {
         // Refresh 토큰은 해커에게 탈취당할 최악의 경우를 대비해 권한(role)을 담지 않고 가볍게 만듭니다.
         return Jwts.builder()
-                .subject(userId)
+                .subject(email)
                 .issuedAt(new Date())
+                .claim("type", "refresh")
+                .claim("email", email)
                 .expiration(new Date(System.currentTimeMillis() + refreshExpirationTime))
                 .signWith(secretKey)
                 .compact();
@@ -78,6 +82,29 @@ public class JwtProvider {
         return expirationDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
+    }
+
+    /**
+     * 리프레시토큰 확인
+     * @param token
+     * @return
+     */
+    public boolean isRefreshToken(String token) {
+        Claims claims = parseClaims(token);
+        return "refresh".equals(claims.get("type", String.class));
+    }
+
+    /**
+     * 토큰 Claim 파싱
+     * @param token
+     * @return
+     */
+    public Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     // 진짜 유효한 토큰인지 확인

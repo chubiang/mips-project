@@ -1,5 +1,7 @@
 // src/workers/authWorker.ts
 
+
+
 // 🌟 React 메인 스레드에서는 절대 접근할 수 없는 워커 전용 메모리 공간
 let accessToken: string | null = null;
 
@@ -7,10 +9,14 @@ self.addEventListener('message', async (event: MessageEvent) => {
     const { type, payload, id } = event.data;
 
     switch (type) {
+        case 'GET_TOKEN':
+            // React가 워커에게 토큰을 달라고 요청하면, 메모리에서 꺼내서 전달합니다.
+            self.postMessage({ type: 'ACCESS_TOKEN_RESPONSE', id, token: accessToken });
+            break;
         case 'SET_TOKEN':
             // 카카오 로그인 성공 직후 React가 워커로 토큰을 던져주면 메모리에 저장합니다.
             accessToken = payload.token;
-            self.postMessage({ type: 'TOKEN_SET', id });
+            self.postMessage({ type: 'ACCESS_TOKEN_SET', id });
             break;
 
         case 'API_REQUEST':
@@ -28,7 +34,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
 
                 // 401(만료) 에러 처리 로직도 워커 안에서 1차적으로 제어 가능합니다.
                 if (response.status === 401) {
-                    self.postMessage({ type: 'API_ERROR', id, error: 'TOKEN_EXPIRED' });
+                    self.postMessage({ type: 'API_ERROR', id, error: 'ACCESS_TOKEN_EXPIRED' });
                     return;
                 }
 

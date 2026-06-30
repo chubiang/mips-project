@@ -1,7 +1,7 @@
 // src/components/Header.tsx
 import { Link } from 'react-router-dom'
 import { LayoutDashboard, TrendingUp, Wallet, LogIn, LogOut, UserPlus } from 'lucide-react'
-import { useAuth } from '@/components/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Header() {
   const { isLoggedIn, logout } = useAuth()
@@ -18,9 +18,10 @@ export default function Header() {
             <TrendingUp className="text-blue-400" /> MIPS
           </div>
           <div className="flex space-x-6 font-medium text-slate-300">
-            <Link to="/" className="flex items-center gap-1 hover:text-white transition"><LayoutDashboard size={18} /> 홈</Link>
+            <Link to="/about-me" className="flex items-center gap-1 hover:text-white transition"><TrendingUp size={18} /> About Me</Link>
+            <Link to="/" className="flex items-center gap-1 hover:text-white transition"><LayoutDashboard size={18} /> Home</Link>
             <Link to="/market" className="flex items-center gap-1 hover:text-white transition"><TrendingUp size={18} /> 시장 동향</Link>
-            <Link to="/portfolio" className="flex items-center gap-1 hover:text-white transition"><Wallet size={18} /> 자산 관리</Link>
+            <Link to="/asset-mng" className="flex items-center gap-1 hover:text-white transition"><Wallet size={18} /> 자산 관리</Link>
             <Link to="/us-stock" className="flex items-center gap-1 hover:text-white transition"><TrendingUp size={18} /> 미국 주식</Link>
             {!isLoggedIn && (
               <Link to="/signup" className="flex items-center gap-1 hover:text-white transition">

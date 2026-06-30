@@ -64,3 +64,12 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.tool.schema: info
     org.hibernate.orm.boot: info
+portone:
+  secret:
+    store-id: ""
+    secret: ""
+    api: ""
+    webhook: ""
+cookie:
+  secure: true
+  same-site: ""
