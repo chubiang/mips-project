@@ -24,9 +24,10 @@ MIPS는 안정적인 사용자 인증을 기반으로 미국 주식, ETF 정보 
 
 ## 🔑 주요 아키텍처 및 보안 설계 포인트
 
-### 1. 보안 중심의 인증 시스템 (구현 중)
+### 1. 보안 중심의 인증 시스템 (완료)
 - **JWT (JSON Web Token) 기반 인증:** 사용자 세션 관리를 위해 Access Token과 Refresh Token 구조를 설계하고 있으며, 프론트엔드 내에서 안전한 상태 관리를 통해 토큰 유출을 방지합니다.
 - **OAuth2 소셜 로그인 연동:** 확장성 있는 회원 관리를 위해 OAuth2 리다이렉션 핸들러를 구축하고 있습니다.
+- **토큰 이원화 및 격리 보관**: Access Token은 Web Worker의 격리된 메모리에, Refresh Token은 HttpOnly 쿠키에 분리 보관하여 XSS 공격을 원천 차단하는 안전한 인증 아키텍처를 구현했습니다.
 
 ### 2. 도메인 중심의 데이터 모델링 (Domain-Driven Design)
 - **자산 및 거래 시스템:** 유기적인 데이터 흐름을 위해 `User`, `AccountBalance`, `Stock`, `TradeOrder`, `EtfComponent` 등의 엔티티를 도메인별로 분리하고 상호작용하도록 유연하게 설계했습니다.
