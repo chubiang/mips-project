@@ -2,16 +2,12 @@ import PortOne from "@portone/browser-sdk/v2"
 import { useState } from "react"
 import type { UserInfo } from "@/types/User"
 import type { paymentStatus } from "@/types/Asset"
-import type { Charge } from "@/types/Charge"
+import type { Charge, ChargeResponse } from "@/types/Charge"
+import type { Props } from "@/types/Comm"
 import { DEFAULT_CHARGE } from "@/types/Charge"
-import { getTokenFromWorker } from '@/api/authWorkerClient'
 import { handleAuthToken } from '@/api/userApi'
 import { handleReqCharge } from '@/api/ChargeApi'
 import { PAYMENT_CONFIG } from "@/config/paymentConfig"
-
-interface Props {
-  onClose: () => void
-}
 
 
 
@@ -34,6 +30,8 @@ export default function ChargePopup({ onClose }: Props) {
       alert("충전 금액을 입력해주세요.")
       return
     }
+    console.log('ENV 전체:', import.meta.env)
+    console.log('STORE:', import.meta.env.VITE_KAKAOPAY_STORE_ID, typeof PAYMENT_CONFIG.KAKAOPAY.storeId)
 
     // 리프레시 토큰으로 사용자 기본정보를 가져옴
     const res = await handleAuthToken()
@@ -46,7 +44,7 @@ export default function ChargePopup({ onClose }: Props) {
     console.log("handleAuthToken-res : ", res, userInfo, userInfo?.email)
 
     // 충전내역 생성 API 호출
-    const chargeResponse = await handleReqCharge({
+    const chargeResponse: ChargeResponse | null = await handleReqCharge({
       chargeId: randomId(),
       paymentId: randomId(),
       storeId: PAYMENT_CONFIG.KAKAOPAY.storeId,
@@ -57,24 +55,30 @@ export default function ChargePopup({ onClose }: Props) {
 
     console.log("chargeResponse", chargeResponse)
 
-    return 
-
-
     // 포트원 결제 요청
-    const paymentId = randomId()
     
-    setCharge((prev) => ({ ...prev, id: paymentId, name: `포인트 ${prev.amount.toLocaleString()}원 충전` }))
+    if (!chargeResponse)
+    {
+      alert("충전 시도를 실패하였습니다!")
+      return
+    }
+
+    setCharge((prev) => ({ chargeId: chargeResponse?.chargeId
+                         , status: chargeResponse?.status
+                         , amount: prev.amount
+                         , currency: prev.currency
+                         , name: `포인트 ${chargeResponse.amount.toLocaleString()}원 충전` }))
     setPaymentStatus({ status: "PENDING", message: "" })
 
 
     const payment = await PortOne.requestPayment({
       storeId: PAYMENT_CONFIG.KAKAOPAY.storeId,
       channelKey: PAYMENT_CONFIG.KAKAOPAY.channelKey,
-      paymentId: chargeResponse.paymentId,
+      paymentId: chargeResponse?.paymentId,
       orderName: charge.name,
       totalAmount: charge.amount,
       currency: charge.currency,
-      payMethod: "CARD",
+      payMethod: "EASY_PAY",
       customData: {
         email: userInfo?.email
       },

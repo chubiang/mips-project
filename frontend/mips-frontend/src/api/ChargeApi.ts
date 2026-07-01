@@ -10,6 +10,7 @@ export const handleReqCharge = async (charge: ChargeRequest): Promise<ChargeResp
       body: JSON.stringify({
         chargeId: charge.chargeId,
         paymentId: charge.paymentId,
+        storeId: charge.storeId,
         amount: charge.amount,
         currency: charge.currency,
         email: charge.email

@@ -26,3 +26,7 @@ export interface TradeOrder {
   quantity: number
   status: OrderStatus
 }
+
+export interface Props {
+  onClose: () => void
+}

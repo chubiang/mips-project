@@ -1,4 +1,4 @@
-export type payStatus = 'IDLE' | 'PENDING' | 'PAID' | 'FAILED'
+export type payStatus = 'IDLE' |'PENDING' | 'PAID' | 'FAILED'
 export type Currency = 'KRW' | 'USD' | 'EUR' | 'JPY' | 'CNY'
 export type StockMarket = "KR" | "US"
 

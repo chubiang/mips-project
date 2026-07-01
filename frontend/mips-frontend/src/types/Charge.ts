@@ -1,7 +1,7 @@
 import type { Currency, payStatus } from '@/types/Asset'
 
 export interface Charge {
-  id: string
+  chargeId: string
   name: string
   amount: number
   currency: Currency
@@ -24,13 +24,13 @@ export interface ChargeResponse {
   email: string
   amount: number
   currency: Currency
-  status: 'PENDING' | 'PAID' | 'FAILED'
+  status: 'IDLE' |'PENDING' | 'PAID' | 'FAILED'
 }
 
 export const DEFAULT_CHARGE: Charge = {
-  id: "",
-  name: "포인트 충전",
+  chargeId: '',
+  name: '포인트 0원 충전',
   amount: 0,
-  currency: "KRW",
-  status: "IDLE",
+  currency: 'KRW',
+  status: 'IDLE',
 }

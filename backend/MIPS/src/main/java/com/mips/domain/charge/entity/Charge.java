@@ -7,9 +7,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "charge", schema = "finance")
 @Getter
@@ -55,11 +57,11 @@ public class Charge {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     // 💡 [비즈니스 로직] 1. 충전 사전 요청 (PENDING 상태로 최초 생성 시 사용)
     public static Charge createPending(User user, String chargeId, Integer amount, String currency) {
@@ -89,5 +91,10 @@ public class Charge {
         this.payment = payment;
         this.status = PaymentStatus.FAILED;
         this.transactionId = transactionId;
+    }
+
+    public void addPayment(Payment payment) {
+        this.payment = payment;
+        payment.setCharge(this);
     }
 }

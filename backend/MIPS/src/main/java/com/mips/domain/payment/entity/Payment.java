@@ -7,11 +7,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "payment", schema = "finance")
 @Getter
@@ -42,7 +44,7 @@ public class Payment {
     @Column(name = "store_id", length = 200, nullable = false)
     private String storeId;
 
-    @Column(name = "bill_no", length = 200, unique = true, nullable = false)
+    @Column(name = "bill_no", length = 200, unique = true)
     private String billNo;        // 결제 건 영수증번호
 
     @Column(name = "pay_method")
@@ -77,12 +79,12 @@ public class Payment {
     private LocalDateTime statusChangedAt;
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt; // 주문 생성 시간
 
     @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt; // 결제 상태 최종 변경 시간
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;// 결제 상태 최종 변경 시간
 
     @Builder
     public Payment(User user, String billNo, Integer amount) {
@@ -101,5 +103,4 @@ public class Payment {
     public void changeStatusToFailed() {
         this.status = PaymentStatus.FAILED;
     }
-
 }
