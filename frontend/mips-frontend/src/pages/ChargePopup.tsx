@@ -98,6 +98,7 @@ export default function ChargePopup({ onClose }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
                             paymentId: payment?.paymentId,
+                            chargeId: charge?.chargeId,
                             storeId: PAYMENT_CONFIG.KAKAOPAY.storeId,
                             email: userInfo?.email,
                           }),

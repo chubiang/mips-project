@@ -9,6 +9,7 @@ import lombok.ToString;
 @ToString
 public class PaymentRequest {
     private String paymentId;
+    private String chargeId;
     private String storeId;
     private String email;
 }
