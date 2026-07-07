@@ -1,6 +1,6 @@
 package com.mips.domain.payment.controller;
 
-import com.mips.domain.payment.dto.PortOneWebhookRequest;
+import com.mips.domain.comm.dto.PaymentWebhook;
 import com.mips.domain.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +16,14 @@ public class PaymentWebhookController {
     private final PaymentService paymentService;
 
     @PostMapping("/webhook")
-    public ResponseEntity<String> handlePortOneWebhook(@RequestBody PortOneWebhookRequest request) {
+    public ResponseEntity<String> handlePortOneWebhook(@RequestBody PaymentWebhook request) {
         log.info("포트원 웹훅 수신: {}", request);
 
         try {
             // 1. 상태가 "paid"(결제 완료)인 경우만 처리
-            if ("paid".equals(request.getStatus())) {
+            if (request.status().equals("PAID")) {
                 // 2. 비즈니스 로직(결제 검증 및 카프카 이벤트 발행) 호출
-                //paymentService.processPaymentComplete(request.getImp_uid(), request.getMerchant_uid());
+//                paymentService.processPaymentComplete(request.getImp_uid(), request.getMerchant_uid());
             }
 
             // 3. 포트원 서버에 정상 수신되었음을 알림 (매우 중요!)

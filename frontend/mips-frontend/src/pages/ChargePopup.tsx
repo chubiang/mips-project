@@ -2,11 +2,11 @@ import PortOne from "@portone/browser-sdk/v2"
 import { useState } from "react"
 import type { UserInfo } from "@/types/User"
 import type { paymentStatus } from "@/types/Asset"
-import type { Charge, ChargeResponse } from "@/types/Charge"
+import type { Charge, ChargeRequest, ChargeResponse, PortoneResponse } from "@/types/Charge"
 import type { Props } from "@/types/Comm"
 import { DEFAULT_CHARGE } from "@/types/Charge"
 import { handleAuthToken } from '@/api/userApi'
-import { handleReqCharge } from '@/api/ChargeApi'
+import { handleReqCharge, handleCompleteCharge } from '@/api/PaymentApi'
 import { PAYMENT_CONFIG } from "@/config/paymentConfig"
 
 
@@ -19,7 +19,7 @@ export default function ChargePopup({ onClose }: Props) {
     message: undefined,
   })
 
-  const isWaitingPayment = paymentStatus.status !== "IDLE"
+  const isWaitingPayment = paymentStatus.status !== "IDLE" && paymentStatus.status !== "PAID" && paymentStatus.status !== "FAILED"
   
   const handlePaymentClose = () =>
     setPaymentStatus({ status: "IDLE", message: "" })
@@ -43,15 +43,17 @@ export default function ChargePopup({ onClose }: Props) {
     setUserInfo(res)
     console.log("handleAuthToken-res : ", res, userInfo, userInfo?.email)
 
-    // 충전내역 생성 API 호출
-    const chargeResponse: ChargeResponse | null = await handleReqCharge({
+
+    const chargeReqParam: ChargeRequest = {
       chargeId: randomId(),
       paymentId: randomId(),
       storeId: PAYMENT_CONFIG.KAKAOPAY.storeId,
       amount: charge.amount,
       currency: charge.currency,
       email: res.email
-    })
+    }
+    /* 결제 요청 전, 충전 내역 처리 API 호출 */
+    const chargeResponse: ChargeResponse | null = await handleReqCharge(chargeReqParam)
 
     console.log("chargeResponse", chargeResponse)
 
@@ -66,16 +68,15 @@ export default function ChargePopup({ onClose }: Props) {
     setCharge((prev) => ({ chargeId: chargeResponse?.chargeId
                          , status: chargeResponse?.status
                          , amount: prev.amount
-                         , currency: prev.currency
-                         , name: `포인트 ${chargeResponse.amount.toLocaleString()}원 충전` }))
+                         , currency: prev.currency }))
     setPaymentStatus({ status: "PENDING", message: "" })
 
-
+    /* 결제 요청 포트원 API 호출 */
     const payment = await PortOne.requestPayment({
       storeId: PAYMENT_CONFIG.KAKAOPAY.storeId,
       channelKey: PAYMENT_CONFIG.KAKAOPAY.channelKey,
       paymentId: chargeResponse?.paymentId,
-      orderName: charge.name,
+      orderName: `포인트 ${charge.amount.toLocaleString()}원 충전`,
       totalAmount: charge.amount,
       currency: charge.currency,
       payMethod: "EASY_PAY",
@@ -93,24 +94,18 @@ export default function ChargePopup({ onClose }: Props) {
       setPaymentStatus({ status: "FAILED", message: payment?.message })
       return
     }
-    const completeResponse = await fetch("/api/pay/complete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-                            paymentId: payment?.paymentId,
-                            chargeId: charge?.chargeId,
-                            storeId: PAYMENT_CONFIG.KAKAOPAY.storeId,
-                            email: userInfo?.email,
-                          }),
-    })
-    if (completeResponse.ok) {
-      const paymentComplete = await completeResponse.json()
-      setPaymentStatus({ status: paymentComplete.status })
+    /* 결제 완료 처리 API 호출 */
+    const completeResponse: PortoneResponse | null = await handleCompleteCharge(chargeReqParam)
+    
+    console.log("completeResponse", completeResponse)
+    if (completeResponse?.status === "PAID") {
+      isWaitingPayment
+      setPaymentStatus({ status: completeResponse?.status })
     } else {
-      setPaymentStatus({ status: "FAILED", message: await completeResponse.text() })
+      setPaymentStatus({ status: "FAILED", message: "결제 완료 처리에 실패했습니다." })
     }
   }
-
+  // 랜덤 ID 생성 함수
   function randomId() {
     return [...crypto.getRandomValues(new Uint32Array(2))]
       .map((word) => word.toString(16).padStart(8, "0"))

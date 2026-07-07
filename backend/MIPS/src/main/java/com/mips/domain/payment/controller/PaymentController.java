@@ -1,5 +1,7 @@
 package com.mips.domain.payment.controller;
 
+import com.mips.domain.comm.dto.ApiResponse;
+import com.mips.domain.comm.enums.ResponseMessage;
 import com.mips.domain.payment.dto.PaymentRequest;
 import com.mips.domain.payment.dto.PortOneResponse;
 import com.mips.domain.payment.service.PaymentService;
@@ -20,10 +22,10 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/complete")
-    public ResponseEntity<PortOneResponse> completePayment(@RequestBody PaymentRequest request) {
+    public ResponseEntity<?> completePayment(@RequestBody PaymentRequest request) {
         log.info("프론트단 결제 수신: {}", request);
         PortOneResponse response = paymentService.processPaymentComplete(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(ResponseMessage.PAYMENT_SUCCESS_DETAILS.format(response.amount().paid(), response.id()), response));
     }
 
 

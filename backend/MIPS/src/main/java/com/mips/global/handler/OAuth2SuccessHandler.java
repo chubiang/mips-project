@@ -58,13 +58,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
         // 이전 발급받은 리프레시 토큰이 있는지 조회함
         List<RefreshToken> refreshTokenList = refreshTokenRepository.findByEmailAndStatus(email, TokenStatus.ACTIVE);
+        String hashToken;
         if (refreshTokenList.isEmpty())
         {
             refreshToken = jwtProvider.createRefreshToken(email);
             expireTime = jwtProvider.getExpirationFromToken(refreshToken);
 
             try {
-                String hashToken = jwtProvider.hmacSha256(refreshToken);
+                hashToken = jwtProvider.hmacSha256(refreshToken); // 단방향으로 한번 더 암호화
                 log.info("hashToken {}", hashToken);
                 // 토큰 저장
                 refreshTokenRepository.save(new RefreshToken(email, hashToken, expireTime));
@@ -74,13 +75,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
         else
         {
+            hashToken = refreshTokenList.get(0).getToken(); // 이미 있는 리프레시 토큰 조회
             refreshToken = refreshTokenList.get(0).getToken();
             expireTime =  refreshTokenList.get(0).getExpiresAt();
         }
         log.info("[OAuth2SuccessHandler] refreshToken: {} expireTime : {}",refreshToken, expireTime);
 
         // Refresh Token을 HttpOnly 쿠키로 굽기
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", hashToken)
                 .httpOnly(true) // JS에서 document.cookie로 접근 불가 (XSS 완벽 차단)
                 .secure(cookieSecure)  // HTTPS 쓸 때는 true로 변경 (지금은 localhost라 false)
                 .sameSite(sameSite)

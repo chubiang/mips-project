@@ -1,0 +1,72 @@
+import type { ChargeRequest, ChargeResponse, PortoneResponse } from "@/types/Charge"
+import { fetchViaWorker } from '@/api/authWorkerClient'
+
+   
+export const handleReqCharge = async (charge: ChargeRequest): Promise<ChargeResponse | null> => {
+    const response = await fetchViaWorker("/api/charge/create", {
+      method: "POST",
+      credentials: 'include',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chargeId: charge.chargeId,
+        paymentId: charge.paymentId,
+        storeId: charge.storeId,
+        amount: charge.amount,
+        currency: charge.currency,
+        email: charge.email
+    }),
+  })
+  if (response?.data) {
+    return {
+      chargeId: response.data.chargeId,
+      transactionId: response.data.transactionId,
+      paymentId: response.data.paymentId,
+      email: response.data.email,
+      amount: response.data.amount,
+      currency: response.data.currency,
+      status: response.data.status,
+    }
+  }
+
+  return null
+}
+
+export const handleCompleteCharge = async (charge: ChargeRequest): Promise<PortoneResponse | null> => {
+  const response = await fetchViaWorker("/api/pay/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+                              paymentId: charge.paymentId,
+                              chargeId: charge.chargeId,
+                              storeId: charge.storeId,
+                              email: charge.email,
+                            }),
+  })
+  if (response?.data) {
+    return {
+      type: response.data.type,
+      message: response.data.message, 
+      id: response.data.id,
+      status: response.data.status,
+      storeId: response.data.storeId,
+      billKey: response.data.billKey,
+      paymentId: response.data.paymentId,
+      transactionId: response.data.transactionId,
+      orderName: response.data.orderName,
+      totalAmount: response.data.totalAmount,
+      channel: response.data.channel,
+      payMethod: response.data.payMethod,
+      currency: response.data.currency,
+      version: response.data.version,
+      pgTxId: response.data.pgTxId,
+      requestedAt: response.data.requestedAt,
+      createdAt: response.data.createdAt,
+      updatedAt: response.data.updatedAt,
+      statusChangedAt: response.data.statusChangedAt,
+      paidAt: response.data.paidAt,
+      cancelAt: response.data.cancelAt,
+      failedAt: response.data.failedAt,
+    }
+  }
+  return null;
+}

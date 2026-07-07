@@ -23,7 +23,6 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserService {
 
     private final JwtProvider jwtProvider;
@@ -34,6 +33,7 @@ public class UserService {
     /*
       토큰 생성하기
      */
+    @Transactional
     public Map<String, Object> createAccessToken(@CookieValue("refreshToken") String refreshToken) throws NoSuchAlgorithmException, InvalidKeyException {
         // 1. DB에 저장된 토큰 검사하기
         Optional<RefreshToken> tokenDB = refreshTokenRepository.findByToken(refreshToken);
@@ -42,7 +42,7 @@ public class UserService {
             throw new IllegalArgumentException("유효하지 않거나 만료된 리프레시 토큰입니다.");
         }
         else if (tokenDB.get().getExpiresAt().isBefore(LocalDateTime.now())) {
-            refreshTokenRepository.updateStatusByToken(TokenStatus.REVOKED.name(), LocalDateTime.now().toString(), refreshToken);
+            refreshTokenRepository.updateStatusByToken(TokenStatus.REVOKED.name(), LocalDateTime.now(), refreshToken);
             if (tokenDB.get().getStatus() != TokenStatus.ACTIVE) {
                 throw new IllegalArgumentException("유효하지 않거나 만료된 리프레시 토큰입니다.");
             }
@@ -73,6 +73,7 @@ public class UserService {
         return LocalDateTime.now().isAfter(refreshToken.getExpiresAt());
     }
 
+    @Transactional
     public Map<String, Object> getUserInfo(String refreshToken) {
         // 1. DB에 저장된 토큰 검사하기
         Optional<RefreshToken> tokenDB = refreshTokenRepository.findByToken(refreshToken);
@@ -81,7 +82,7 @@ public class UserService {
             throw new IllegalArgumentException("유효하지 않거나 만료된 리프레시 토큰입니다.");
         }
         else if (tokenDB.get().getExpiresAt().isBefore(LocalDateTime.now())) {
-            refreshTokenRepository.updateStatusByToken(TokenStatus.REVOKED.name(), LocalDateTime.now().toString(), refreshToken);
+            refreshTokenRepository.updateStatusByToken(TokenStatus.REVOKED.name(), LocalDateTime.now(), refreshToken);
             if (tokenDB.get().getStatus() != TokenStatus.ACTIVE) {
                 throw new IllegalArgumentException("유효하지 않거나 만료된 리프레시 토큰입니다.");
             }

@@ -4,7 +4,6 @@ import com.mips.domain.charge.entity.Charge;
 import com.mips.domain.payment.enums.PaymentStatus;
 import com.mips.domain.payment.enums.SelectedChannelType;
 import com.mips.domain.user.entity.User;
-import io.portone.sdk.server.common.PgProvider;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -47,7 +46,6 @@ public class Payment {
     @Column(name = "bill_no", length = 200, unique = true)
     private String billNo;        // 결제 건 영수증번호
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "pay_method")
     private String payMethod;
 

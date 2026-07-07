@@ -24,6 +24,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
             value = "UPDATE refresh_token SET status = :status, revoke_at = :revokeAt WHERE token = :token",
             nativeQuery = true
     )
-    int updateStatusByToken(@Param("status") String status, @Param("revokeAt") String revokeAt, @Param("token") String token);
+    int updateStatusByToken(@Param("status") String status, @Param("revokeAt") LocalDateTime revokeAt, @Param("token") String token);
 
 }
