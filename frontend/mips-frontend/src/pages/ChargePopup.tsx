@@ -99,7 +99,6 @@ export default function ChargePopup({ onClose }: Props) {
     
     console.log("completeResponse", completeResponse)
     if (completeResponse?.status === "PAID") {
-      isWaitingPayment
       setPaymentStatus({ status: completeResponse?.status })
     } else {
       setPaymentStatus({ status: "FAILED", message: "결제 완료 처리에 실패했습니다." })
