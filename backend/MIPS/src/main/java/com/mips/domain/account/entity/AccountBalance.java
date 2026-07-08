@@ -26,6 +26,7 @@ public class AccountBalance extends BaseTimeEntity {
     private BigDecimal lockedCash = BigDecimal.ZERO;
 
     @Version // JPA 결제 버그 방어
+    @Column(nullable = false)
     private Long version;
 
     // ★ 객체지향적 비즈니스 로직: "주문할 때 내 가용 현금을 묶는다" (Setter 대신 사용)
@@ -36,4 +37,13 @@ public class AccountBalance extends BaseTimeEntity {
         this.availableCash = this.availableCash.subtract(orderAmount);
         this.lockedCash = this.lockedCash.add(orderAmount);
     }
+    // 충전용
+    public void availableCashCharge(BigDecimal charge) {
+        if (charge == null || charge.signum() <= 0) {
+            throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+        }
+
+        this.availableCash = this.availableCash.add(charge);
+    }
+
 }

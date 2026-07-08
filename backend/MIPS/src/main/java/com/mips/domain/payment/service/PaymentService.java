@@ -2,6 +2,8 @@ package com.mips.domain.payment.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mips.domain.account.entity.AccountBalance;
+import com.mips.domain.account.repository.AccountBalanceRepository;
 import com.mips.domain.charge.entity.Charge;
 import com.mips.domain.charge.repository.ChargeRepository;
 import com.mips.domain.comm.utils.DateTimeUtils;
@@ -36,6 +38,7 @@ public class PaymentService {
     private final PaymentRawLogService paymentRawLogService;
     private final ChargeRepository chargeRepository;
     private final PaymentRepository paymentRepository;
+    private final AccountBalanceRepository accountBalanceRepository;
     private final ObjectMapper objectMapper;
 
 
@@ -44,6 +47,7 @@ public class PaymentService {
                           PaymentRawLogService paymentRawLogService,
                           ChargeRepository chargeRepository,
                           PaymentRepository paymentRepository,
+                          AccountBalanceRepository accountBalanceRepository,
                           ObjectMapper objectMapper
     ) {
         this.portoneRestClient = portoneRestClient;
@@ -51,6 +55,7 @@ public class PaymentService {
         this.paymentRawLogService = paymentRawLogService;
         this.chargeRepository = chargeRepository;
         this.paymentRepository = paymentRepository;
+        this.accountBalanceRepository = accountBalanceRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -82,36 +87,45 @@ public class PaymentService {
             PortOneResponse finalResPayment = resPayment;
 
              // 3. Charge에 update
-            Optional<Charge> charge = chargeRepository.findByChargeId(request.getChargeId());
-            charge.ifPresent(c -> {
-                c.setTransactionId(finalResPayment.transactionId());
-                c.setStatus(PaymentStatus.valueOf(finalResPayment.status()));
+            Charge c = chargeRepository.findByChargeId(request.getChargeId())
+                    .orElseThrow(() -> new IllegalArgumentException("충전 정보를 찾을 수 없습니다."));
 
-                // status가 지불일 때
-                if (finalResPayment.status().equals(PaymentStatus.PAID.name())) {
-                    c.setPaidAt(DateTimeUtils.toKstLocalDateTime(finalResPayment.paidAt()));
-                }
-                // status가 취소일 때
-                else if (finalResPayment.status().equals(PaymentStatus.CANCELLED.name())) {
-                    c.setCanceledAt(DateTimeUtils.toKstLocalDateTime(finalResPayment.cancelledAt()));
-                }
+            c.setTransactionId(finalResPayment.transactionId());
+            c.setStatus(PaymentStatus.valueOf(finalResPayment.status()));
 
-                chargeRepository.save(c);
-            });
+            // status가 지불일 때
+            boolean isPaid = finalResPayment.status().equals(PaymentStatus.PAID.name());
+            if (isPaid) {
+                c.setPaidAt(DateTimeUtils.toKstLocalDateTime(finalResPayment.paidAt()));
+            }
+            // status가 취소일 때
+            else if (finalResPayment.status().equals(PaymentStatus.CANCELLED.name())) {
+                c.setCanceledAt(DateTimeUtils.toKstLocalDateTime(finalResPayment.cancelledAt()));
+            }
+
+            chargeRepository.save(c);
 
             // 4. Payment에 update
-            Optional<Payment> payment = paymentRepository.findByPaymentId(request.getPaymentId());
-            payment.ifPresent( p -> {
-                p.setTransactionId(finalResPayment.transactionId());
-                p.setStatus(PaymentStatus.valueOf(finalResPayment.status()));
-                p.setBillingKey(finalResPayment.billingKey());
-                p.setVersion(finalResPayment.version());
-                p.setChannel(SelectedChannelType.valueOf(String.valueOf(finalResPayment.channel().type())));
-                if (finalResPayment.channelGroup() != null) {
-                    p.setChannelGroup(finalResPayment.channelGroup().id());
-                }
-                paymentRepository.save(p);
-            });
+            Payment p = paymentRepository.findByPaymentId(request.getPaymentId())
+                        .orElseThrow(() -> new IllegalArgumentException("결제요청 정보를 찾을 수 없습니다."));
+
+            p.setTransactionId(finalResPayment.transactionId());
+            p.setStatus(PaymentStatus.valueOf(finalResPayment.status()));
+            p.setBillingKey(finalResPayment.billingKey());
+            p.setVersion(finalResPayment.version());
+            p.setChannel(SelectedChannelType.valueOf(String.valueOf(finalResPayment.channel().type())));
+            if (finalResPayment.channelGroup() != null) {
+                p.setChannelGroup(finalResPayment.channelGroup().id());
+            }
+            paymentRepository.save(p);
+
+            // 5. 결제 성공 시에, 고객 계좌에 UPDATE
+            if (isPaid) {
+                AccountBalance acc = accountBalanceRepository.findByUserId(c.getUser().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("잔고 정보를 찾을 수 없습니다."));
+
+            }
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

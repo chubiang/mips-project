@@ -70,3 +70,21 @@ export const handleCompleteCharge = async (charge: ChargeRequest): Promise<Porto
   }
   return null;
 }
+
+export const handleGetCharge = async (chargeId: string): Promise<ChargeResponse | null> => {
+  const response = await fetchViaWorker(`/api/pay/${paymentId}`, {
+        method: "GET",  
+      headers: { "Content-Type": "application/json" },
+  })
+  if (response?.data) {
+    return {
+      chargeId: response.data.chargeId,
+      transactionId: response.data.transactionId,
+      paymentId: response.data.paymentId,
+      email: response.data.email,
+      amount: response.data.amount,
+      currency: response.data.currency
+    }
+  }
+  return null;
+}

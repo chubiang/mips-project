@@ -11,7 +11,6 @@ export interface payment {
   code?: number
 }
 
-
 export interface HoldingStock {
   ticker: string
   name: string

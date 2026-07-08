@@ -100,6 +100,8 @@ export default function ChargePopup({ onClose }: Props) {
     console.log("completeResponse", completeResponse)
     if (completeResponse?.status === "PAID") {
       setPaymentStatus({ status: completeResponse?.status })
+      /* 충전금액 조회 API 호출 */
+      
     } else {
       setPaymentStatus({ status: "FAILED", message: "결제 완료 처리에 실패했습니다." })
     }
