@@ -38,12 +38,12 @@ public class AccountBalance extends BaseTimeEntity {
         this.lockedCash = this.lockedCash.add(orderAmount);
     }
     // 충전용
-    public void availableCashCharge(BigDecimal charge) {
-        if (charge == null || charge.signum() <= 0) {
+    public void availableCashCharge(Long charge) {
+        if (charge == null || 0L >= charge) {
             throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
         }
 
-        this.availableCash = this.availableCash.add(charge);
+        this.availableCash = this.availableCash.add(BigDecimal.valueOf(charge));
     }
 
 }

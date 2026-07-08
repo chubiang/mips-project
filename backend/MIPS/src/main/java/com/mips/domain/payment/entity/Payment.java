@@ -27,7 +27,7 @@ public class Payment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "email", nullable = false)
+    @JoinColumn(name = "user_db_id", nullable = false)
     private User user;
 
     @Column(name = "payment_id", length = 64, unique = true, nullable = false)

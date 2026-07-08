@@ -124,6 +124,8 @@ public class PaymentService {
                 AccountBalance acc = accountBalanceRepository.findByUserId(c.getUser().getId())
                         .orElseThrow(() -> new IllegalArgumentException("잔고 정보를 찾을 수 없습니다."));
 
+                acc.availableCashCharge(finalResPayment.amount().paid());
+                accountBalanceRepository.save(acc);
             }
 
         } catch (JsonProcessingException e) {
