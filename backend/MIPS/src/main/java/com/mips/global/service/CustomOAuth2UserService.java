@@ -1,5 +1,7 @@
 package com.mips.global.service;
 
+import com.mips.domain.account.entity.AccountBalance;
+import com.mips.domain.account.repository.AccountBalanceRepository;
 import com.mips.domain.user.entity.User;
 import com.mips.domain.user.repository.UserRepository;
 import com.mips.global.component.CustomOAuth2User;
@@ -12,6 +14,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,7 +23,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private  final UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final AccountBalanceRepository accountBalanceRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -53,6 +57,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .build());
 
         userRepository.save(user);
+
+        // 고객 계좌 생성
+        boolean isExistCustomer = accountBalanceRepository.findByUserId(user.getId()).isPresent();
+        if (!isExistCustomer) {
+            AccountBalance acc = AccountBalance.builder()
+                                .user(user)
+                                .availableCash(BigDecimal.ZERO)
+                                .lockedCash(BigDecimal.ZERO)
+                                .build();
+            accountBalanceRepository.save(acc);
+        }
+
+
 
         // Spring Security가 인식할 수 있는 Custom한 OAuth2User 객체로 래핑하여 반환
         return new CustomOAuth2User(user, attributes);

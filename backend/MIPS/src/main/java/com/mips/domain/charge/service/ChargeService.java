@@ -28,12 +28,13 @@ public class ChargeService {
                 .orElseThrow(() -> new IllegalArgumentException(ResponseMessage.INVALID_USER.getMessage()));
 
         Charge charge = Charge.createPending(user,
-                chargeRequest.getPaymentId(),
+                chargeRequest.getChargeId(),
                 chargeRequest.getAmount(),
                 chargeRequest.getCurrency());
 
         Payment payment = Payment.builder()
                 .paymentId(chargeRequest.getPaymentId())
+                .charge(charge)
                 .amount(chargeRequest.getAmount())
                 .storeId(chargeRequest.getStoreId())
                 .currency(chargeRequest.getCurrency())

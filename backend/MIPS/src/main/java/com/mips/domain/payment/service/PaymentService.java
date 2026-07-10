@@ -10,10 +10,8 @@ import com.mips.domain.comm.utils.DateTimeUtils;
 import com.mips.domain.payment.dto.PaymentRequest;
 import com.mips.domain.payment.dto.PortOneResponse;
 import com.mips.domain.payment.entity.Payment;
-import com.mips.domain.payment.entity.PaymentRawLog;
 import com.mips.domain.payment.enums.PaymentStatus;
 import com.mips.domain.payment.enums.SelectedChannelType;
-import com.mips.domain.payment.repository.PaymentRawLogRepository;
 import com.mips.domain.payment.repository.PaymentRepository;
 import com.mips.global.config.PortOneSecretProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -95,6 +88,7 @@ public class PaymentService {
 
             // status가 지불일 때
             boolean isPaid = finalResPayment.status().equals(PaymentStatus.PAID.name());
+            log.info("status가 PAID? {}", isPaid);
             if (isPaid) {
                 c.setPaidAt(DateTimeUtils.toKstLocalDateTime(finalResPayment.paidAt()));
             }
@@ -109,6 +103,7 @@ public class PaymentService {
             Payment p = paymentRepository.findByPaymentId(request.getPaymentId())
                         .orElseThrow(() -> new IllegalArgumentException("결제요청 정보를 찾을 수 없습니다."));
 
+            p.setAmount(finalResPayment.amount().paid().intValue()); // 실제 지불금액만 UPDATE
             p.setTransactionId(finalResPayment.transactionId());
             p.setStatus(PaymentStatus.valueOf(finalResPayment.status()));
             p.setBillingKey(finalResPayment.billingKey());

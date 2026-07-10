@@ -19,3 +19,9 @@ export interface HoldingStock {
   currentPrice: number
   market: StockMarket
 }
+export interface AccountInfo {
+  email: string
+  balance: number
+  currency: Currency
+  lockCashes: number
+}

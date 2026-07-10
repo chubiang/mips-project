@@ -1,7 +1,8 @@
 import type { ChargeRequest, ChargeResponse, PortoneResponse } from "@/types/Charge"
+import type { AccountInfo } from "@/types/Asset"
 import { fetchViaWorker } from '@/api/authWorkerClient'
 
-   
+// 충전요청 처리 API 호출   
 export const handleReqCharge = async (charge: ChargeRequest): Promise<ChargeResponse | null> => {
     const response = await fetchViaWorker("/api/charge/create", {
       method: "POST",
@@ -31,6 +32,7 @@ export const handleReqCharge = async (charge: ChargeRequest): Promise<ChargeResp
   return null
 }
 
+// 충전완료 처리 API 호출
 export const handleCompleteCharge = async (charge: ChargeRequest): Promise<PortoneResponse | null> => {
   const response = await fetchViaWorker("/api/pay/complete", {
         method: "POST",
@@ -71,19 +73,18 @@ export const handleCompleteCharge = async (charge: ChargeRequest): Promise<Porto
   return null;
 }
 
-export const handleGetCharge = async (chargeId: string): Promise<ChargeResponse | null> => {
-  const response = await fetchViaWorker(`/api/pay/${paymentId}`, {
+// 사용자 계정 계좌 정보 조회
+export const handleGetAccountInfo = async (): Promise<AccountInfo | null> => {
+  const response = await fetchViaWorker(`/api/acc/get`, {
         method: "GET",  
       headers: { "Content-Type": "application/json" },
   })
   if (response?.data) {
     return {
-      chargeId: response.data.chargeId,
-      transactionId: response.data.transactionId,
-      paymentId: response.data.paymentId,
       email: response.data.email,
-      amount: response.data.amount,
-      currency: response.data.currency
+      balance: response.data.balance,
+      currency: response.data.currency,
+      lockCashes: response.data.lockCashes,
     }
   }
   return null;

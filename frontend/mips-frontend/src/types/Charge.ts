@@ -85,6 +85,10 @@ export interface PayMethod {
   }
 }
 
+export interface AccountInfo {
+  accountId: string
+}
+
 export const DEFAULT_CHARGE: Charge = {
   chargeId: '',
   amount: 0,

@@ -36,7 +36,7 @@ public class Charge {
     private String transactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "email", nullable = false)
+    @JoinColumn(name = "user_db_id", nullable = false)
     private User user;
 
     @Column(name = "amount", nullable = false)
