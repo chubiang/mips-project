@@ -47,9 +47,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 로그인 성공한 유저의 정보 꺼내기
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-        String email = oAuth2User.getAttribute("email");
+        String email = oAuth2User.getName();
         String role = oAuth2User.getRole();
         String token = oAuth2User.getAttribute("token");
+        log.info("email {} role {} token {}", email, role, token);
         String refreshToken = ""; // 리프레시 토큰
         LocalDateTime expireTime = null; // 리프레시 토큰 만료되는 시간
 
