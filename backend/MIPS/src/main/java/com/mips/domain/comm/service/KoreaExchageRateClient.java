@@ -1,9 +1,11 @@
 package com.mips.domain.comm.service;
 
 import com.mips.domain.comm.enums.Currency;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+@Component
 public class KoreaExchageRateClient implements ExchangeRateClient {
 
     @Override

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class ExchangeRateService implements ExchangeRateProvider  {
 
-    private final ExchangeRateClient exchangeRateClient;
+    private final KoreaExchageRateClient exchangeRateClient;
 
     @Override
     public BigDecimal getRate(Currency from, Currency to) {
