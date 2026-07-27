@@ -1,64 +1,87 @@
-# 🚀 MIPS (인증 및 주식/자산 관리 플랫폼)
+# 🚀 MIPS
+### 인증 기반 미국 주식·ETF 및 자산 관리 플랫폼
 
-> **프로젝트 상태:** 🛠️ 개발 진행 중 (WIP - Work In Progress)  
-> 본 프로젝트는 현재 풀스택 아키텍처 및 보안 표준을 학습하고 적용하기 위해 고도화 중인 미완성 프로젝트입니다. 비록 완성이 끝나지 않았으나, 컴포넌트 설계, 데이터 흐름, 그리고 보안 핵심 로직의 구현 과정을 투명하게 공개하여 기술적 역량을 검증받고자 합니다.
+MIPS는 금융권 시스템 개발 경험을 바탕으로 인증, 자산 관리, 주식 주문 흐름을 현대적인 웹 아키텍처로 재구성하는 개인 프로젝트입니다.
+
+React와 Spring Boot를 기반으로 프론트엔드와 백엔드를 분리하고, JWT·OAuth2 인증, 자산 및 주문 도메인 모델링, 외부 주식 API 연동을 구현하고 있습니다.
+
+현재 핵심 인증 구조와 주요 도메인 엔티티 설계를 완료했으며, 결제·예수금·주문 체결·동시성 처리 기능을 단계적으로 확장하고 있습니다.
 
 ---
 
-## 📌 프로젝트 개요
-MIPS는 안정적인 사용자 인증을 기반으로 미국 주식, ETF 정보 조회 및 거래, 자산 관리를 제공하는 모던 풀스택 웹 애플리케이션입니다. 프론트엔드와 백엔드의 엄격한 역할 분리를 지향하며, 확장성과 보안성을 최우선으로 설계하고 있습니다.
+## 주요 기능
 
-## 🛠️ 기술 스택 (Tech Stack)
+### 구현 완료
+- Google·Kakao OAuth2 로그인 연동
+- Spring Security 기반 JWT 발급·검증
+- Access Token과 Refresh Token 분리 관리
+- 미국 주식 정보 조회(n8n을 이용)
+- 사용자·계좌잔액·주식·주문 도메인 모델링
+- Spring Boot 멀티 모듈 구조 구성
+- React 기반 기본 화면 및 라우팅 구성
+- PortOne 카카오페이 간편결제
+
+### 구현 예정
+- 일반 회원가입 및 로그인 API
+- 주식 매수·매도 주문 처리
+- 주문 체결 시 동시성 제어
+- 거래 내역 및 자산 현황 조회
+
+---
+
+## 기술 스택
 
 ### Frontend
-- **Core:** React, TypeScript, Vite
-- **State Management:** React Context API / 상태 관리 라이브러리
-- **Build Tool / Linter:** Vite, ESLint
+- React
+- TypeScript
+- Vite
+- React Context API
+- ESLint
 
 ### Backend
-- **Core:** Java, Spring Boot
-- **Build Tool:** Gradle
-- **Database / ORM:** JPA (Hibernate)
+- Java
+- Spring Boot
+- Spring Security
+- JPA
+- Hibernate
+- Gradle
+
+### External API
+- Finnhub
+- PortOne
+- Google OAuth2
+- Kakao OAuth2
 
 ---
 
-## 🔑 주요 아키텍처 및 보안 설계 포인트
+## 인증 설계
 
-### 1. 보안 중심의 인증 시스템 (완료)
-- **JWT (JSON Web Token) 기반 인증:** 사용자 세션 관리를 위해 Access Token과 Refresh Token 구조를 설계하고 있으며, 프론트엔드 내에서 안전한 상태 관리를 통해 토큰 유출을 방지합니다.
-- **OAuth2 소셜 로그인 연동:** 확장성 있는 회원 관리를 위해 OAuth2 리다이렉션 핸들러를 구축하고 있습니다.
-- **토큰 이원화 및 격리 보관**: Access Token은 Web Worker의 격리된 메모리에, Refresh Token은 HttpOnly 쿠키에 분리 보관하여 XSS 공격을 원천 차단하는 안전한 인증 아키텍처를 구현했습니다.
-
-### 2. 도메인 중심의 데이터 모델링 (Domain-Driven Design)
-- **자산 및 거래 시스템:** 유기적인 데이터 흐름을 위해 `User`, `AccountBalance`, `Stock`, `TradeOrder`, `EtfComponent` 등의 엔티티를 도메인별로 분리하고 상호작용하도록 유연하게 설계했습니다.
+- Access Token은 Web Worker 메모리에 보관
+- Refresh Token은 HttpOnly 쿠키에 저장
+- 토큰 저장 위치를 분리해 인증 정보 노출 위험을 줄이도록 설계
+- OAuth2 로그인 이후 프론트엔드 리다이렉션 처리 구현
+- Spring Security 필터를 통한 JWT 검증
 
 ---
 
-## 📊 현재 구현 상황 및 로드맵 (Project Status)
+## 도메인 모델
+- User : 사용자
+- Account : 계좌
+- Charg : 충전
+- Comm : 공통
+- Stock : 주식
+- Order : 주문
+- Payment : 결제
 
-### [프론트엔드]
-- [x] Vite + TypeScript + React 프로젝트 초기 아키텍처 환경 세팅
-- [x] UI 컴포넌트(Header, 기본적인 페이지 라우팅 및 레이아웃) 구조화
-- [x] 로그인(Login) 및 주식 정보 조회(UsStock) 페이지 마크업 및 타입 정의
-- [x] JWT 및 OAuth2 기반 로그인 상태 연동 및 네비게이션 바 동적 렌더링 (Google, Kakao)
-- [ ] 회원가입 화면 구현
-- [ ] 포트원(Portone) SDK 연동을 통한 가상결제 및 예수금 충전 UI 구현 
-- [ ] 주식 상세 페이지 내 실시간 호가 반영 및 매수/매도 주문 유효성 검사 기능 
-
-### [백엔드]
-- [x] Spring Boot + Gradle 멀티 모듈 프로젝트 구조 설계
-- [x] 핵심 도메인 엔티티(AccountBalance, TradeOrder, Stock, User) 모델링 및 JPA 매핑
-- [x] 인증/인가를 위한 Spring Security 및 JWT 발급/검증 로직 구현
-- [x] 로컬 n8n을 이용한 Finnhub 사의 미국 주식 API 조회
-- [ ] 회원가입 및 로그인 처리 로직 구현
-- [ ] 가상 결제 완료 정보 수신 및 계좌 잔액(AccountBalance) 갱신 API 개발
-- [ ] 동시성 이슈를 고려한 주식 주문(TradeOrder) 체결 및 트랜잭션 처리 로직 구현
+주식, 자산, 주문 도메인을 분리하고 각 엔티티 간 책임과 관계를 정의했습니다.
 
 ---
 
-## 📂 폴더 구조 (Directory Structure)
+## 프로젝트 구조
 
 ```text
 my-portfolio-project/
-├── frontend/mips-frontend/   # React + TypeScript 프론트엔드 소스코드
-└── backend/MIPS/             # Spring Boot + Gradle 백엔드 소스코드
+├── frontend/
+│   └── mips-frontend/
+└── backend/
+    └── MIPS/
