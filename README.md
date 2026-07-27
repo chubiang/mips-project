@@ -15,7 +15,7 @@ React와 Spring Boot를 기반으로 프론트엔드와 백엔드를 분리하�
 - Google·Kakao OAuth2 로그인 연동
 - Spring Security 기반 JWT 발급·검증
 - Access Token과 Refresh Token 분리 관리
-- 미국 주식 정보 조회(n8n을 이용)
+- 미국 주식 정보 조회(Docker를 통해 로컬 n8n을 이용)
 - 사용자·계좌잔액·주식·주문 도메인 모델링
 - Spring Boot 멀티 모듈 구조 구성
 - React 기반 기본 화면 및 라우팅 구성
