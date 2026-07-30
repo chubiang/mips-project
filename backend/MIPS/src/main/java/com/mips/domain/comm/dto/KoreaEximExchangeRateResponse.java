@@ -11,11 +11,11 @@ public record KoreaEximExchangeRateResponse(
         String ttb,
         String tts,
         String dealBasR,
-        int bkpr,
+        String bkpr,
         int yyEfeeR,
         int tenDdEfeeR,
-        int kftcBkpr,
-        double kftcDealBasR,
+        String kftcBkpr,
+        String kftcDealBasR,
         String curNm
 ) {
 }
