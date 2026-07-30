@@ -1,19 +1,23 @@
 package com.mips.domain.comm.enums;
 
 public enum Currency {
-    KRW(0),
-    USD(2),
-    JPY(0),
-    EUR(2),
-    CNY(2);
+    KRW("KRW", 0),
+    USD("USD",2),
+    JPY("JPY", 0),
+    EUR("EUR", 2),
+    CNY("CNY", 2);
 
+    private final String unit;
     private final int scale;
 
-    Currency(int scale) {
+    Currency(String unit, int scale) {
+        this.unit = unit;
         this.scale = scale;
     }
-
+    public String getUnit() { return unit; }
     public int getScale() {
         return scale;
     }
+
+
 }
