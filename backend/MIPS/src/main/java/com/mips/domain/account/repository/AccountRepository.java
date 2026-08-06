@@ -16,7 +16,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>  {
                  where acc.user.id = :userId
                    and acc.status = :status
             """)
-    Optional<Account> findByUserId(@Param("userId") Long userId, AccountStatus status);
+    Optional<Account> findByUserId(@Param("userId") Long userId, String status);
 
     @Query(
             value = "SELECT nextval('finance.account_number_seq')",

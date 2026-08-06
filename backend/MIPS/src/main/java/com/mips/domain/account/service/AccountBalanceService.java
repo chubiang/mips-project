@@ -4,6 +4,7 @@ import com.mips.domain.account.dto.AccBalanceRequest;
 import com.mips.domain.account.dto.AccBalanceResponse;
 import com.mips.domain.account.entity.Account;
 import com.mips.domain.account.entity.AccountBalance;
+import com.mips.domain.account.enums.AccountStatus;
 import com.mips.domain.account.repository.AccountBalanceRepository;
 import com.mips.domain.account.repository.AccountRepository;
 import com.mips.domain.comm.service.CurrencyConversionService;
@@ -28,7 +29,7 @@ public class AccountBalanceService {
 
     public AccBalanceResponse getAccBalance(AccBalanceRequest request) {
         User user = userService.getUserByRefreshToken(request.refreshToken());
-        Account acc = accountRepository.findByUserId(user.getId())
+        Account acc = accountRepository.findByUserId(user.getId(), AccountStatus.ACTIVE.name())
                                 .orElseThrow(() -> new IllegalArgumentException("회원정보를 찾을 수 없습니다."));
         AccountBalance accBalance = accountBalanceRepository.findByAccountId(acc.getId())
                 .orElseThrow(() -> new IllegalArgumentException("계좌정보를 찾을 수 없습니다."));

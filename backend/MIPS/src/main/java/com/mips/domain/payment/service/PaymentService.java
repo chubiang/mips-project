@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mips.domain.account.entity.Account;
 import com.mips.domain.account.entity.AccountBalance;
+import com.mips.domain.account.enums.AccountStatus;
 import com.mips.domain.account.repository.AccountBalanceRepository;
 import com.mips.domain.account.repository.AccountRepository;
 import com.mips.domain.charge.entity.Charge;
@@ -123,8 +124,8 @@ public class PaymentService {
 
             // 5. 결제 성공 시에, 고객 계좌에 UPDATE
             if (isPaid) {
-                // 계좌조회 - ACTIVE 상태의 계좌 조회
-                Account acc = accountRepository.findByUserId(c.getUser().getId())
+                // 계좌조회 - ACTIVE 계좌 조회
+                Account acc = accountRepository.findByUserId(c.getUser().getId(), AccountStatus.ACTIVE.name())
                         .orElseThrow(() -> new IllegalArgumentException("계좌 정보를 찾을 수 없습니다."));
                 // 조회된 계좌로 결제처리
                 AccountBalance balance = accountBalanceRepository.findByAccountId(acc.getId())
