@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface AccountBalanceRepository extends JpaRepository<AccountBalance, Long>  {
 
-        Optional<AccountBalance> findByUserId(Long userId);
+        Optional<AccountBalance> findByAccountId(Long accountId);
 
-}

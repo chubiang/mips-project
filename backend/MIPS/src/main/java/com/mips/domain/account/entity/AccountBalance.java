@@ -1,6 +1,7 @@
 package com.mips.domain.account.entity;
 
 import com.mips.domain.comm.entity.BaseTimeEntity;
+import com.mips.domain.comm.enums.Currency;
 import com.mips.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,15 +24,24 @@ public class AccountBalance extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
     @Column(name = "available_cash", nullable = false, precision = 19, scale = 4)
     private BigDecimal availableCash = BigDecimal.ZERO;
 
     @Column(name = "locked_cash", nullable = false, precision = 19, scale = 4)
     private BigDecimal lockedCash = BigDecimal.ZERO;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency", nullable = false, length = 3)
+    private Currency currency;
+
     @Version // JPA 결제 버그 방어
     @Column(nullable = false)
     private Long version;
+
 
     // ★ 객체지향적 비즈니스 로직: "주문할 때 내 가용 현금을 묶는다" (Setter 대신 사용)
     public void lockCashForOrder(BigDecimal orderAmount) {

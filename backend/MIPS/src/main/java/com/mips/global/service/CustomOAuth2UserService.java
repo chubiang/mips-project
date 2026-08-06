@@ -1,7 +1,12 @@
 package com.mips.global.service;
 
+import com.mips.domain.account.entity.Account;
 import com.mips.domain.account.entity.AccountBalance;
+import com.mips.domain.account.enums.AccountStatus;
+import com.mips.domain.account.enums.AccountType;
 import com.mips.domain.account.repository.AccountBalanceRepository;
+import com.mips.domain.account.repository.AccountRepository;
+import com.mips.domain.comm.enums.Currency;
 import com.mips.domain.user.entity.User;
 import com.mips.domain.user.repository.UserRepository;
 import com.mips.global.component.CustomOAuth2User;
@@ -15,8 +20,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,6 +30,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final AccountBalanceRepository accountBalanceRepository;
+    private final AccountRepository accountRepository;
+    public static final String ACC_PROD_CD = "010";
+    public static final String PROJ_NUM = "27";
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -58,15 +66,37 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         userRepository.save(user);
 
-        // 고객 계좌 생성
-        boolean isExistCustomer = accountBalanceRepository.findByUserId(user.getId()).isPresent();
-        if (!isExistCustomer) {
-            AccountBalance acc = AccountBalance.builder()
+        // 1. 고객 계좌 생성
+        Optional<Account> acc = accountRepository.findByUserId(user.getId());
+        if (acc.isEmpty()) {
+            // 계좌번호 시퀀스 조회
+            Long accSeq = accountRepository.getNextAccountNumberSequence();
+            // 계좌번호 생성
+            String accNumber = ACC_PROD_CD +
+                    "-" +
+                    PROJ_NUM +
+                    "-" +
+                    accSeq;
+            // Account 신규생성
+            Account account = Account.builder()
+                                    .accountType(AccountType.CASH)
+                                    .status(AccountStatus.ACTIVE)
+                                    .baseCurrency(Currency.KRW)
+                                    .accountNumber(accNumber)
+                                    .build()
+                                    ;
+            accountRepository.save(account);
+        }
+
+        // 2. 고객 계좌 - 잔액정보 생성
+        boolean isExistAcc = accountBalanceRepository.findByAccountId(user.getId()).isPresent();
+        if (!isExistAcc) {
+            AccountBalance balance = AccountBalance.builder()
                                 .user(user)
                                 .availableCash(BigDecimal.ZERO)
                                 .lockedCash(BigDecimal.ZERO)
                                 .build();
-            accountBalanceRepository.save(acc);
+            accountBalanceRepository.save(balance);
         }
 
 

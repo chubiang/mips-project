@@ -2,8 +2,10 @@ package com.mips.domain.payment.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mips.domain.account.entity.Account;
 import com.mips.domain.account.entity.AccountBalance;
 import com.mips.domain.account.repository.AccountBalanceRepository;
+import com.mips.domain.account.repository.AccountRepository;
 import com.mips.domain.charge.entity.Charge;
 import com.mips.domain.charge.repository.ChargeRepository;
 import com.mips.domain.comm.utils.DateTimeUtils;
@@ -22,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 public class PaymentService {
@@ -31,6 +35,7 @@ public class PaymentService {
     private final PaymentRawLogService paymentRawLogService;
     private final ChargeRepository chargeRepository;
     private final PaymentRepository paymentRepository;
+    private final AccountRepository accountRepository;
     private final AccountBalanceRepository accountBalanceRepository;
     private final ObjectMapper objectMapper;
 
@@ -40,6 +45,7 @@ public class PaymentService {
                           PaymentRawLogService paymentRawLogService,
                           ChargeRepository chargeRepository,
                           PaymentRepository paymentRepository,
+                          AccountRepository accountRepository,
                           AccountBalanceRepository accountBalanceRepository,
                           ObjectMapper objectMapper
     ) {
@@ -48,6 +54,7 @@ public class PaymentService {
         this.paymentRawLogService = paymentRawLogService;
         this.chargeRepository = chargeRepository;
         this.paymentRepository = paymentRepository;
+        this.accountRepository = accountRepository;
         this.accountBalanceRepository = accountBalanceRepository;
         this.objectMapper = objectMapper;
     }
@@ -116,11 +123,15 @@ public class PaymentService {
 
             // 5. 결제 성공 시에, 고객 계좌에 UPDATE
             if (isPaid) {
-                AccountBalance acc = accountBalanceRepository.findByUserId(c.getUser().getId())
+                // 계좌조회 - ACTIVE 상태의 계좌 조회
+                Account acc = accountRepository.findByUserId(c.getUser().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("계좌 정보를 찾을 수 없습니다."));
+                // 조회된 계좌로 결제처리
+                AccountBalance balance = accountBalanceRepository.findByAccountId(acc.getId())
                         .orElseThrow(() -> new IllegalArgumentException("잔고 정보를 찾을 수 없습니다."));
 
-                acc.availableCashCharge(finalResPayment.amount().paid());
-                accountBalanceRepository.save(acc);
+                balance.availableCashCharge(finalResPayment.amount().paid());
+                accountBalanceRepository.save(balance);
             }
 
         } catch (JsonProcessingException e) {
