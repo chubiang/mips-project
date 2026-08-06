@@ -61,8 +61,7 @@ public class SecurityConfig {
                                     "/api/auth/refresh",
                                     "/api/auth/refresh-user",
                                     "/api/stock/**",
-                                    "/api/payments/webhook",
-                                    "").permitAll()
+                                    "/api/payments/webhook").permitAll()
                     .requestMatchers("/api/user/**", "/api/order/**","/api/pay/**").authenticated()
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")  // 관리자 전용
                     .anyRequest().authenticated() // 그 외 나머지 요청은 인증(로그인) 필요
