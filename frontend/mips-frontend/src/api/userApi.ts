@@ -1,4 +1,5 @@
-import { setTokenToWorker, fetchViaWorker } from '@/api/authWorkerClient'
+import { setTokenToWorker } from '@/api/authWorkerClient'
+import requestApi from '@/api/requestApi';
 import type { ApiResponse } from '@/types/Comm'
 import type { SignupRequest, UserInfo } from '@/types/User'
 
@@ -16,9 +17,10 @@ export const handleLogout = async (): Promise<void> => {
 
     // 2. 백엔드에 로그아웃 요청 → HttpOnly 리프레시 토큰 쿠키 삭제
     try {
-        await fetch('http://localhost:8082/api/auth/logout', {
+        await requestApi({
+            url: '/api/auth/logout',
             method: 'POST',
-            credentials: 'include', // 쿠키 전송 필수
+            withCredentials: true, // 쿠키 전송 필수
         })
     } catch {
         // 백엔드 요청이 실패해도 프론트 정리는 계속 진행
@@ -32,30 +34,26 @@ export const handleLogout = async (): Promise<void> => {
 };
 
 export async function handleSignup(data: SignupRequest): Promise<ApiResponse<string>> {
-  const response = await fetch("http://localhost:8082/api/auth/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+  const response = await requestApi({
+    url: '/api/auth/signup',
+    method: 'POST',
+    data
   });
 
   if (!response.ok) {
-    const error = await response.json()
+    const error = await response.data as ApiResponse<string>;
     throw new Error(error.message ?? "회원가입에 실패했습니다.");
   }
 
-  return response.json()
+  return response.data as ApiResponse<string>;
 }
 
 export async function handleAuthToken(): Promise<UserInfo | null> {
-  const response = await fetchViaWorker('/api/auth/refresh-user', {
+  const response = await requestApi({
+    url: '/api/auth/refresh-user',
     method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  })
+    withCredentials: true
+  });
 
   if (response?.data) {
     return {

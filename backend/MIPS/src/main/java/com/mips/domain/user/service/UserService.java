@@ -69,7 +69,8 @@ public class UserService {
         RefreshToken tokenDB = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않거나 만료된 리프레시 토큰입니다."));
 
-        if (tokenDB.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (tokenDB.getExpiresAt().isBefore(LocalDateTime.now())
+         || tokenDB.getStatus() == TokenStatus.REVOKED) {
             refreshTokenRepository.updateStatusByToken(TokenStatus.REVOKED.name(), LocalDateTime.now(), refreshToken);
             if (tokenDB.getStatus() != TokenStatus.ACTIVE) {
                 throw new IllegalArgumentException("유효하지 않거나 만료된 리프레시 토큰입니다.");

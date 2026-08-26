@@ -1,22 +1,23 @@
+import requestApi  from "@/api/requestApi"
 import type { ChargeRequest, ChargeResponse, PortoneResponse } from "@/types/Charge"
 import type { AccountInfo } from "@/types/Asset"
-import { fetchViaWorker } from '@/api/authWorkerClient'
+import type { ApiResponse } from "@/types/Comm"
 
 // 충전요청 처리 API 호출   
 export const handleReqCharge = async (charge: ChargeRequest): Promise<ChargeResponse | null> => {
-    const response = await fetchViaWorker("/api/charge/create", {
+    const response = await requestApi({
+      url: "/api/charge/create",
       method: "POST",
-      credentials: 'include',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+      withCredentials: true,
+      data: JSON.stringify({
         chargeId: charge.chargeId,
         paymentId: charge.paymentId,
         storeId: charge.storeId,
         amount: charge.amount,
         currency: charge.currency,
         email: charge.email
-    }),
-  })
+      })
+    });
   if (response?.data) {
     return {
       chargeId: response.data.chargeId,
@@ -34,16 +35,17 @@ export const handleReqCharge = async (charge: ChargeRequest): Promise<ChargeResp
 
 // 충전완료 처리 API 호출
 export const handleCompleteCharge = async (charge: ChargeRequest): Promise<PortoneResponse | null> => {
-  const response = await fetchViaWorker("/api/pay/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-                              paymentId: charge.paymentId,
-                              chargeId: charge.chargeId,
-                              storeId: charge.storeId,
-                              email: charge.email,
-                            }),
-  })
+  const response = await requestApi({
+    url: "/api/pay/complete",
+    method: "POST",
+    withCredentials: true,
+    data: JSON.stringify({
+      paymentId: charge.paymentId,
+      chargeId: charge.chargeId,
+      storeId: charge.storeId,
+      email: charge.email,
+    }),
+  });
   if (response?.data) {
     return {
       type: response.data.type,
@@ -75,17 +77,10 @@ export const handleCompleteCharge = async (charge: ChargeRequest): Promise<Porto
 
 // 사용자 계정 계좌 정보 조회
 export const handleGetAccountInfo = async (): Promise<AccountInfo | null> => {
-  const response = await fetchViaWorker(`/api/acc/get`, {
-        method: "GET",  
-      headers: { "Content-Type": "application/json" },
-  })
-  if (response?.data) {
-    return {
-      email: response.data.email,
-      balance: response.data.balance,
-      currency: response.data.currency,
-      lockCashes: response.data.lockCashes,
-    }
-  }
-  return null;
+  const response = await requestApi<ApiResponse<AccountInfo>>({
+    url: "/api/acc/get",
+    method: "GET",
+    withCredentials: true
+  });
+  return response.data.data ?? null;
 }

@@ -104,7 +104,7 @@ export default function ChargePopup({ onClose }: Props) {
       handleGetAccountInfo().then((accountInfo) => {
         if (accountInfo) {
           console.log("accountInfo", accountInfo)
-          alert(`충전이 완료되었습니다. 현재 잔액: ${accountInfo.balance.toLocaleString()} ${accountInfo.currency}`)
+          //alert(`충전이 완료되었습니다. 현재 잔액: ${accountInfo.balance.toLocaleString()} ${accountInfo.currency}`)
         }
       })
       

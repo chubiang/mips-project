@@ -125,7 +125,7 @@ public class PaymentService {
             // 5. 결제 성공 시에, 고객 계좌에 UPDATE
             if (isPaid) {
                 // 계좌조회 - ACTIVE 계좌 조회
-                Account acc = accountRepository.findByUserId(c.getUser().getId(), AccountStatus.ACTIVE.name())
+                Account acc = accountRepository.findByUserId(c.getUser().getId(), AccountStatus.ACTIVE)
                         .orElseThrow(() -> new IllegalArgumentException("계좌 정보를 찾을 수 없습니다."));
                 // 조회된 계좌로 결제처리
                 AccountBalance balance = accountBalanceRepository.findByAccountId(acc.getId())

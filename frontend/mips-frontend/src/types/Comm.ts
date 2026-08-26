@@ -1,5 +1,14 @@
 // src/types/Comm.ts
-
+// 공통 요청 래퍼 만들기
+export interface ApiRequestOptions {
+  method: "GET" | "POST" | "PUT" | "DELETE";
+  url: string;
+  headers?: Record<string, string>;
+  // Axios uses `withCredentials` boolean instead of the Fetch `credentials` option
+  withCredentials?: boolean;
+  params?: unknown;
+  data?: unknown;
+}
 
 // 1. 공통 API 응답 타입 (Spring Boot가 내려줄 응답 형태와 맞춥니다)
 export interface ApiResponse<T> {

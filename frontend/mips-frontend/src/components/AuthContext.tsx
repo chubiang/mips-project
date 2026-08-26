@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react'
-import { fetchViaWorker, setTokenToWorker } from '@/api/authWorkerClient'
+import { setTokenToWorker } from '@/api/authWorkerClient'
 import { AuthContext } from '@/contexts/AuthContext'
 import { handleLogout } from '@/api/userApi'
+import requestApi from '@/api/requestApi'
 import type { ApiResponse } from '@/types/Comm'
 
 
@@ -14,16 +15,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     isRequestSent.current = true
 
-    // silentRefresh를 fetchViaWorker 호출 전에 선언 (TS2448 방지)
+    // silentRefresh를 requestApi 호출 전에 선언 (TS2448 방지)
     const silentRefresh = async (): Promise<void> => {
       try {
-        const response = await fetch('http://localhost:8082/api/auth/refresh', {
+        const response = await requestApi({
+          url: '/api/auth/refresh',
           method: 'POST',
-          credentials: 'include',
+          withCredentials: true,
         })
 
-        if (response.ok) {
-          const resdata: ApiResponse<Response> = await response.json()
+        if (response.status >= 200 && response.status < 300) {
+          const resdata = response.data as ApiResponse<{ token: string }>
           console.log("silentRefresh",response, resdata)
           await setTokenToWorker(resdata.data.token)
           setIsLoggedIn(true)
@@ -38,15 +40,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    fetchViaWorker('http://localhost:8082/api/user/pass')
+    requestApi({
+      url: '/api/user/pass',
+      method: 'GET',
+      withCredentials: true,
+    })
       .then((data) => {
         console.log("로그인 상태 확인 성공:", data)
         setIsLoggedIn(true)
       })
       .catch((error) => {
         console.log("로그인 안 된 상태거나 토큰 만료됨:", error)
-        silentRefresh()
-        isRequestSent.current = false
+        void silentRefresh()
       })
   }, [])
 

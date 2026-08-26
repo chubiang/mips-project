@@ -69,7 +69,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 1. 고객 계좌 생성
         Optional<Account> optionalAccount =
-                accountRepository.findByUserId(user.getId(),  AccountStatus.ACTIVE.name());
+                accountRepository.findByUserId(user.getId(),  AccountStatus.ACTIVE);
 
         Account account;
 

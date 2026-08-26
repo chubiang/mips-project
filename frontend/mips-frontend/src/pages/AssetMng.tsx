@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import type { HoldingStock, StockMarket } from "@/types/Asset"
 import ChargePopup from "@/pages/ChargePopup"
+import { handleGetAccountInfo } from '@/api/PaymentApi'
 
 export default function AssetMng() {
   const [showCharge, setShowCharge] = useState(false)
   const [market, setMarket] = useState<StockMarket>("KR")
   const [holdings, setHoldings] = useState<HoldingStock[]>([])
-  const [totalBalance] = useState<number>(0)
+  const [totalBalance, setTotalBalance] = useState<number>(0)
   const [totalInvested] = useState<number>(0)
   const [totalKrw] = useState<number>(0)
 
@@ -24,6 +25,17 @@ export default function AssetMng() {
   }, [])
 
   const filteredHoldings = holdings.filter((h) => h.market === market)
+  
+  function chgMarket(market: StockMarket) {
+    setMarket(market)
+    handleGetAccountInfo().then((accountInfo) => {
+          if (accountInfo) {
+            console.log("accountInfo", accountInfo)
+            setTotalBalance(accountInfo.balance)
+            //alert(`충전이 완료되었습니다. 현재 잔액: ${accountInfo.balance.toLocaleString()} ${accountInfo.currency}`)
+          }
+        })
+  }
 
   return (
     <>
@@ -56,7 +68,7 @@ export default function AssetMng() {
             <div className="flex rounded-lg overflow-hidden border border-[var(--border)]">
               <button
                 type="button"
-                onClick={() => setMarket("KR")}
+                onClick={() => chgMarket("KR")}
                 className={`px-5 py-1.5 text-sm font-medium transition cursor-pointer ${
                   market === "KR"
                     ? "bg-[var(--accent)] text-white"
@@ -67,7 +79,7 @@ export default function AssetMng() {
               </button>
               <button
                 type="button"
-                onClick={() => setMarket("US")}
+                onClick={() => chgMarket("US")}
                 className={`px-5 py-1.5 text-sm font-medium transition cursor-pointer ${
                   market === "US"
                     ? "bg-[var(--accent)] text-white"
