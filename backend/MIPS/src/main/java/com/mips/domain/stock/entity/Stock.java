@@ -32,9 +32,11 @@ public class Stock {
     @Column(name = "sector", length = 50)
     private String sector;
 
+    @Builder.Default
     @Column(length = 20)
     private String status = "ACTIVE";
 
+    @Builder.Default
     @Column(name = "has_components", nullable = false)
     private Boolean hasComponents = false;
 

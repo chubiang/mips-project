@@ -88,8 +88,6 @@ public class KoreaEximExchangeRateClient implements ExchangeRateClient {
                         .retrieve()
                         .body(KoreaEximExchangeRateResponse[].class);
 
-        log.info("response {}", response);
-
         return response == null
                 ? new KoreaEximExchangeRateResponse[0]
                 : response;

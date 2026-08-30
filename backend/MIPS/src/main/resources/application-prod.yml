@@ -1,0 +1,82 @@
+app:
+  oauth2:
+    authorized-redirect-uri: ${OAUTH2_REDIRECT_URI}
+    failed-redirect-uri: ${OAUTH2_FAILED_REDIRECT_URI}
+server:
+  port: 8082
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: ${KAKAKO_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            client-name: Kakao
+            scope:
+              - profile_nickname
+              - profile_image
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+  data:
+    redis:
+      host: redis
+      port: 6379
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      default_schema: finance
+      format_sql: true
+    show-sql: true
+  application:
+    name: MIPS
+jwt:
+  secret-key: ${JWT_SECRET}
+  access-expiration-time: 1800000  # 30분 (30 * 60 * 1000)
+  refresh-expiration-time: 604800000 # 7일 (7 * 24 * 60 * 60 * 1000)
+Jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.tool.schema: info
+    org.hibernate.orm.boot: info
+portone:
+  secret:
+    store-id: ${PORTONE_STORE_ID}
+    secret: ${PORTONE_SECRET}
+    api: ${PORTONE_API}
+    webhook: ${PORTONE_WEBHOOK}
+koreaexim:
+  exchange-url: ${KOREAEXIM_EXCHANGE_URL}
+  secret: ${KOREAEXIM_SECRET}
+cookie:
+  secure: true
+  same-site: ${COOKIE_SAME_SITE}

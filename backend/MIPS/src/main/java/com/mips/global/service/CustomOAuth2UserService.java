@@ -49,7 +49,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info("kakaoAccount {}", kakaoAccount);
             email = (String) kakaoAccount.get("email");
 
-            Map<String, Object> kakaoProfile=  (Map<String, Object>) kakaoAccount.get("profile");
+            Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
             username = (String) kakaoProfile.get("nickname");
         }
 

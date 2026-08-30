@@ -1,58 +1,57 @@
-version: '3.8'
-
 services:
-  # PostgreSQL (결제/정산 원장 데이터 저장용)
   postgres:
-    image: postgres:15-alpine
-    container_name: mips_postgres
-    environment:
-      POSTGRES_USER: finance_admin
-      POSTGRES_PASSWORD: mips_password
-      POSTGRES_DB: postgres
-      TZ: Asia/Seoul
     ports:
-      - "5432:5432"
+      - "5433:5432"
+    image: postgres:16-alpine
+    container_name: mips-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}f
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - mips_postgres_data:/var/lib/postgresql/data
-    restart: always
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mips-network
 
-  # Redis
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-
-  # Kafka (이벤트 기반 비동기 통신 핵심 - Zookeeper 없는 최신 KRaft 모드)
-  kafka:
-    image: bitnami/kafka:3.6
-    container_name: mips_kafka
-    ports:
-      - "9092:9092"
-    environment:
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-    volumes:
-      - mips_kafka_data:/bitnami/kafka
-    restart: always
-
-  # Kafka UI (내가 발행한 이벤트를 눈으로 확인하는 관리자 대시보드)
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: mips_kafka_ui
-    ports:
-      - "8090:8080" # 브라우저에서 localhost:8090 으로 접속합니다.
-    environment:
-      - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mips-backend
+    container_name: mips-backend
+    restart: unless-stopped
     depends_on:
-      - kafka
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JASYPT_PASSWORD: ${JASYPT_PASSWORD}
+      OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI}
+      OAUTH2_FAILED_REDIRECT_URI: ${OAUTH2_FAILED_REDIRECT_URI}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
+      KAKAKO_REDIRECT_URI: ${KAKAKO_REDIRECT_URI}
+      PORTONE_STORE_ID: ${PORTONE_STORE_ID}
+      PORTONE_SECRET: ${PORTONE_SECRET}
+      PORTONE_API: ${PORTONE_API}
+      PORTONE_WEBHOOK: ${PORTONE_WEBHOOK}
+      KOREAEXIM_EXCHANGE_URL: ${KOREAEXIM_EXCHANGE_URL}
+      KOREAEXIM_SECRET: ${KOREAEXIM_SECRET}
+      COOKIE_SAME_SITE: ${COOKIE_SAME_SITE}
+
+
+    networks:
+      - mips-network
 
 volumes:
-  mips_postgres_data:
-  mips_kafka_data:
+  postgres_data:
+
+networks:
+  mips-network:

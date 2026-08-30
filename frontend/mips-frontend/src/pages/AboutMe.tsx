@@ -125,7 +125,7 @@ const skillGroups: SkillGroup[] = [
   },
    {
     category: '개인학습 기술 스택',
-    items: ['TypeScript', 'React', 'Vite', 'Kafka', 'Python', 'Redis', 'n8n', 'Docker', 'Kubernetes'],
+    items: ['TypeScript', 'React', 'Vite', 'Python', 'Redis', 'n8n'],
     color: 'bg-blue-100 text-blue-700',
   },
 ]

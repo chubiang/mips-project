@@ -43,6 +43,7 @@ public class Account extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     private AccountStatus status;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(nullable = false, length = 3)

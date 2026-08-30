@@ -28,9 +28,11 @@ public class AccountBalance extends BaseTimeEntity {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
+    @Builder.Default
     @Column(name = "available_cash", nullable = false, precision = 19, scale = 4)
     private BigDecimal availableCash = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "locked_cash", nullable = false, precision = 19, scale = 4)
     private BigDecimal lockedCash = BigDecimal.ZERO;
 
