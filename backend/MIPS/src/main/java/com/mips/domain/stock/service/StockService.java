@@ -1,10 +1,10 @@
 package com.mips.domain.stock.service;
 
-import com.mips.domain.stock.entity.Stock;
+import com.mips.domain.stock.entity.StockDetail;
 
 import java.util.List;
 
 public interface StockService {
-    public Stock findByTicker(String ticker);
-    public List<Stock> findAll();
+    public StockDetail findByTicker(String ticker);
+    public List<StockDetail> findAll();
 }

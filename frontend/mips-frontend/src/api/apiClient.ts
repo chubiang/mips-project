@@ -6,10 +6,11 @@ import type {
     AxiosResponse 
 } from 'axios';
 import { getTokenFromWorker } from '@/api/authWorkerClient'
+import { API_BASE_URL } from '@/api/comm'
 
 // 1. 공통 Axios 인스턴스 생성
 const apiClient: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8082', // 백엔드 기본 주소
+    baseURL: API_BASE_URL,
     timeout: 5000, // 5초 이상 응답 없으면 타임아웃
     headers: {
         'Content-Type': 'application/json',

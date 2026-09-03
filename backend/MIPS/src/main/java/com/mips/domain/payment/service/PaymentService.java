@@ -41,7 +41,7 @@ public class PaymentService {
     private final ObjectMapper objectMapper;
 
 
-    public PaymentService(@Autowired @Qualifier("portoneRestClient") RestClient portoneRestClient,
+    public PaymentService(@Qualifier("portoneRestClient") RestClient portoneRestClient,
                           PortOneSecretProperties properties,
                           PaymentRawLogService paymentRawLogService,
                           ChargeRepository chargeRepository,

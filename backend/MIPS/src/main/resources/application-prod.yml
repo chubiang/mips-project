@@ -5,6 +5,11 @@ app:
 server:
   port: 8082
 spring:
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
   security:
     oauth2:
       client:
@@ -25,7 +30,7 @@ spring:
             client-name: Kakao
             scope:
               - profile_nickname
-              - profile_image
+              - account_email
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
@@ -38,7 +43,7 @@ spring:
       port: 6379
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DB_URL}
+    url: ${DB_URL}?currentSchema=finance
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
@@ -77,6 +82,16 @@ portone:
 koreaexim:
   exchange-url: ${KOREAEXIM_EXCHANGE_URL}
   secret: ${KOREAEXIM_SECRET}
+finnhub:
+  api: ${FINNHUB_API}
+  secret: ${FINNHUB_SECRET}
+nasdaq:
+  top100-api: ${NSDAQ100_API}
 cookie:
   secure: true
   same-site: ${COOKIE_SAME_SITE}
+batch:
+  nasdaq:
+    cron: "0 0 7 * * *"
+  finnhub:
+    cron: "0 */5 * * * *"

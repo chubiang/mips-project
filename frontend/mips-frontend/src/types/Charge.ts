@@ -1,4 +1,4 @@
-import type { Currency } from '@/types/Asset'
+import type { Currency, StockMarket } from '@/types/Asset'
 
 export interface Charge {
   chargeId: string
@@ -89,9 +89,14 @@ export interface AccountInfo {
   accountId: string
 }
 
+export interface chgMarketProps {
+  chgMarket: (market: StockMarket) => void;
+}
+
 export const DEFAULT_CHARGE: Charge = {
   chargeId: '',
   amount: 0,
   currency: 'KRW',
   status: 'IDLE',
 }
+

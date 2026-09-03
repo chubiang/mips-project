@@ -60,6 +60,7 @@ public class SecurityConfig {
                                     "/api/signup",
                                     "/api/auth/refresh",
                                     "/api/auth/refresh-user",
+                                    "/api/auth/conn-test",
                                     "/api/stock/**",
                                     "/api/payments/webhook").permitAll()
                     .requestMatchers("/api/user/**", "/api/order/**","/api/pay/**").authenticated()

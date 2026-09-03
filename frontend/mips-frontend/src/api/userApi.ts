@@ -2,13 +2,14 @@ import { setTokenToWorker } from '@/api/authWorkerClient'
 import requestApi from '@/api/requestApi';
 import type { ApiResponse } from '@/types/Comm'
 import type { SignupRequest, UserInfo } from '@/types/User'
+import { API_BASE_URL } from '@/api/comm'
 
 export const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8082/oauth2/authorization/google'
+    window.location.href = `${API_BASE_URL}/oauth2/authorization/google`
 };
 
 export const handleKakaoLogin = () => {
-    window.location.href = 'http://localhost:8082/oauth2/authorization/kakao'
+    window.location.href = `${API_BASE_URL}/oauth2/authorization/kakao`
 };
 
 export const handleLogout = async (): Promise<void> => {
@@ -54,6 +55,8 @@ export async function handleAuthToken(): Promise<UserInfo | null> {
     method: 'POST',
     withCredentials: true
   });
+
+  console.log("handleAuthToken-response : ", response, response?.data)
 
   if (response?.data) {
     return {

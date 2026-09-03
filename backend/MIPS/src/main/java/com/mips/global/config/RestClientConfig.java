@@ -13,9 +13,15 @@ public class RestClientConfig {
 
     private final KoreaEximProperties koreaEximProperties;
 
-    public RestClientConfig(PortOneSecretProperties portOneSecretProperties, KoreaEximProperties koreaEximProperties) {
+    private final FinnhubProperties finnhubProperties;
+
+    private final NasdaqProperties nasdaqProperties;
+
+    public RestClientConfig(PortOneSecretProperties portOneSecretProperties, KoreaEximProperties koreaEximProperties, FinnhubProperties finnhubProperties, NasdaqProperties nasdaqProperties) {
         this.portOneSecretProperties = portOneSecretProperties;
         this.koreaEximProperties = koreaEximProperties;
+        this.finnhubProperties = finnhubProperties;
+        this.nasdaqProperties = nasdaqProperties;
     }
 
     @Bean
@@ -36,6 +42,24 @@ public class RestClientConfig {
                 .build();
     }
 
+    @Bean
+    public RestClient finnhubRestClient() {
+        log.info("finnhubRestClient {} ", finnhubProperties.getApi());
+        return RestClient.builder()
+                .baseUrl(finnhubProperties.getApi())
+                .defaultHeader("Content-Type", "application/json")
+                .defaultHeader("X-Finnhub-Token", finnhubProperties.getSecret())
+                .build();
+    }
+
+    @Bean
+    public RestClient nasdaq100RestClient() {
+        log.info("nasdaqRestClient {} ", nasdaqProperties.getTop100Api());
+        return RestClient.builder()
+                .baseUrl(nasdaqProperties.getTop100Api())
+                .defaultHeader("Content-Type", "application/json")
+                .build();
+    }
 
 
 }

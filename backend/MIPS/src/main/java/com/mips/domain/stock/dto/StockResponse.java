@@ -1,6 +1,6 @@
 package com.mips.domain.stock.dto;
 
-import com.mips.domain.stock.entity.Stock;
+import com.mips.domain.stock.entity.SecurityQuote;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -12,8 +12,6 @@ public class StockResponse {
     private final String ticker;
     private final String companyName;
     private final String assetType;
-    private final String sector;
-    private final String status;
 
     private final BigDecimal price;
     private final BigDecimal changeAmount;
@@ -24,19 +22,17 @@ public class StockResponse {
     private final BigDecimal prevClose;
     private final LocalDateTime updatedAt;
 
-    public StockResponse(Stock stock) {
-        this.ticker = stock.getTicker();
-        this.companyName = stock.getCompanyName();
-        this.assetType = stock.getAssetType();
-        this.sector = stock.getSector();
-        this.status = stock.getStatus();
-        this.price = stock.getPrice();
-        this.changeAmount = stock.getChangeAmount();
-        this.changeRate = stock.getChangeRate();
-        this.highPrice = stock.getHighPrice();
-        this.lowPrice = stock.getLowPrice();
-        this.openPrice = stock.getOpenPrice();
-        this.prevClose = stock.getPrevClose();
-        this.updatedAt = stock.getUpdatedAt();
+    public StockResponse(SecurityQuote quote) {
+        this.ticker = quote.getSecurity().getTicker();
+        this.companyName = quote.getSecurity().getName();
+        this.assetType = quote.getSecurity().getSecurityType().toString();
+        this.price = quote.getCurrentPrice();
+        this.changeAmount = quote.getCurrentPrice().subtract(quote.getPrevClose());
+        this.changeRate = quote.getPercentageChange();
+        this.highPrice = quote.getHighPrice();
+        this.lowPrice = quote.getLowPrice();
+        this.openPrice = quote.getOpenPrice();
+        this.prevClose = quote.getPrevClose();
+        this.updatedAt = quote.getUpdatedAt();
     }
 }

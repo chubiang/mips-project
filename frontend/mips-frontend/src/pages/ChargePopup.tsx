@@ -2,7 +2,7 @@ import PortOne from "@portone/browser-sdk/v2"
 import { useState } from "react"
 import type { UserInfo } from "@/types/User"
 import type { paymentStatus } from "@/types/Asset"
-import type { Charge, ChargeRequest, ChargeResponse, PortoneResponse } from "@/types/Charge"
+import type { Charge, ChargeRequest, ChargeResponse, PortoneResponse, chgMarketProps } from "@/types/Charge"
 import type { Props } from "@/types/Comm"
 import { DEFAULT_CHARGE } from "@/types/Charge"
 import { handleAuthToken } from '@/api/userApi'
@@ -11,7 +11,7 @@ import { PAYMENT_CONFIG } from "@/config/paymentConfig"
 
 
 
-export default function ChargePopup({ onClose }: Props) {
+export default function ChargePopup({ chgMarket, onClose }: chgMarketProps & Props) {
   const [charge, setCharge] = useState<Charge>(DEFAULT_CHARGE)
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [paymentStatus, setPaymentStatus] = useState<paymentStatus>({
@@ -35,13 +35,13 @@ export default function ChargePopup({ onClose }: Props) {
 
     // 리프레시 토큰으로 사용자 기본정보를 가져옴
     const res = await handleAuthToken()
+    console.log("handleAuthToken-res : ", res, userInfo, userInfo?.email)
     if (!res || !res.email)
     {
       alert("사용자정보 조회실패!")
       return
     }
     setUserInfo(res)
-    console.log("handleAuthToken-res : ", res, userInfo, userInfo?.email)
 
 
     const chargeReqParam: ChargeRequest = {
@@ -100,14 +100,7 @@ export default function ChargePopup({ onClose }: Props) {
     console.log("completeResponse", completeResponse)
     if (completeResponse?.status === "PAID") {
       setPaymentStatus({ status: completeResponse?.status })
-      /* TODO 충전금액 조회 API 호출 */
-      handleGetAccountInfo().then((accountInfo) => {
-        if (accountInfo) {
-          console.log("accountInfo", accountInfo)
-          //alert(`충전이 완료되었습니다. 현재 잔액: ${accountInfo.balance.toLocaleString()} ${accountInfo.currency}`)
-        }
-      })
-      
+      chgMarket("KR");
     } else {
       setPaymentStatus({ status: "FAILED", message: "결제 완료 처리에 실패했습니다." })
     }

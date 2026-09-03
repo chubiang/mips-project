@@ -29,12 +29,11 @@ export default function AssetMng() {
   function chgMarket(market: StockMarket) {
     setMarket(market)
     handleGetAccountInfo().then((accountInfo) => {
-          if (accountInfo) {
-            console.log("accountInfo", accountInfo)
-            setTotalBalance(accountInfo.balance)
-            //alert(`충전이 완료되었습니다. 현재 잔액: ${accountInfo.balance.toLocaleString()} ${accountInfo.currency}`)
-          }
-        })
+      if (accountInfo) {
+        console.log("accountInfo", accountInfo)
+        setTotalBalance(accountInfo.balance)
+      }
+    })
   }
 
   return (
@@ -180,7 +179,7 @@ export default function AssetMng() {
 
       </div>
 
-      {showCharge && <ChargePopup onClose={() => setShowCharge(false)} />}
+      {showCharge && <ChargePopup chgMarket={chgMarket} onClose={() => setShowCharge(false)} />}
     </>
   )
 }

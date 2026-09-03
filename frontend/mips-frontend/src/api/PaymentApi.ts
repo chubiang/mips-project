@@ -77,10 +77,10 @@ export const handleCompleteCharge = async (charge: ChargeRequest): Promise<Porto
 
 // 사용자 계정 계좌 정보 조회
 export const handleGetAccountInfo = async (): Promise<AccountInfo | null> => {
-  const response = await requestApi<ApiResponse<AccountInfo>>({
+  const response = await requestApi<AccountInfo>({
     url: "/api/acc/get",
     method: "GET",
     withCredentials: true
   });
-  return response.data.data ?? null;
+  return response.data ?? null;
 }

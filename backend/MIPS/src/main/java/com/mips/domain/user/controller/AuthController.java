@@ -7,9 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +20,11 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
+
+    @GetMapping("/conn-test")
+    public ResponseEntity<ApiResponse> connTest(HttpServletRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("접속 성공!"));
+    }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(HttpServletRequest request) {

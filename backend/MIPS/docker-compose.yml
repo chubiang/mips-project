@@ -25,7 +25,7 @@ services:
       - postgres
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      DB_URL: ${DB_URL}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
@@ -44,9 +44,12 @@ services:
       PORTONE_WEBHOOK: ${PORTONE_WEBHOOK}
       KOREAEXIM_EXCHANGE_URL: ${KOREAEXIM_EXCHANGE_URL}
       KOREAEXIM_SECRET: ${KOREAEXIM_SECRET}
+      FINNHUB_API: ${FINNHUB_API}
+      FINNHUB_SECRET: ${FINNHUB_SECRET}
+      NSDAQ100_API: ${NSDAQ100_API}
       COOKIE_SAME_SITE: ${COOKIE_SAME_SITE}
-
-
+    ports:
+      - "8081:8082"
     networks:
       - mips-network
 

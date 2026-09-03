@@ -1,10 +1,10 @@
 package com.mips.domain.order.entity;
 
+import com.mips.domain.stock.entity.SecurityMaster;
 import com.mips.domain.user.entity.User;
 import com.mips.domain.comm.entity.BaseTimeEntity;
 import com.mips.domain.order.enums.OrderStatus;
 import com.mips.domain.order.enums.OrderType;
-import com.mips.domain.stock.entity.Stock;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -25,8 +25,8 @@ public class TradeOrder extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticker", referencedColumnName = "ticker")
-    private Stock stock;
+    @JoinColumn(name = "stock_id", nullable = false)
+    private SecurityMaster securityMaster;
 
     @Enumerated(EnumType.STRING) // Enum 이름을 DB에 그대로 문자열로 저장
     @Column(name = "order_type", nullable = false, length = 10)
