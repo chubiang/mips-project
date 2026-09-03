@@ -34,7 +34,7 @@ public class NasdaqTests {
     @BeforeEach
     void setUp() {
         Properties props = new Properties();
-        try (FileInputStream fis = new FileInputStream("src/test/resources/test-config.properties")) {
+        try (FileInputStream fis = new FileInputStream("src/test/resources/testConfig.properties")) {
             props.load(fis);
 
             // 읽어온 Properties를 시스템 속성(System Property)으로 복사 등록

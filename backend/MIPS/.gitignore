@@ -36,7 +36,10 @@ out/
 ### VS Code ###
 .vscode/
 
+### test 리소스 올리기 방지 ###
+src/test/resources/**
 ### properties ###
+# Properties 파일 무시
 src/test/resources/*.properties
 src/main/resources/application-local.yml
 .env
