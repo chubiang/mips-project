@@ -1,7 +1,9 @@
 package com.mips.domain.stock.batch;
 
 import com.mips.domain.stock.entity.SecurityMaster;
+import com.mips.domain.stock.entity.SecurityPriceHistory;
 import com.mips.domain.stock.entity.SecurityQuote;
+import com.mips.domain.stock.repository.SecurityPriceHistoryRepository;
 import com.mips.domain.stock.repository.SecurityQuoteRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +20,10 @@ public class SecurityQuoteWriter implements ItemWriter<SecurityQuote> {
 
     private final EntityManager entityManager;
     private final SecurityQuoteRepository securityQuoteRepository;
+    private final SecurityPriceHistoryRepository securityPriceHistoryRepository;
 
     @Override
-    public void write(@NotNull Chunk<? extends SecurityQuote> chunk) throws Exception {
+    public void write(@NotNull Chunk<? extends SecurityQuote> chunk) {
         for (SecurityQuote newQuote : chunk) {
             Long securityId = newQuote.getSecurity().getId();
 
@@ -52,6 +55,15 @@ public class SecurityQuoteWriter implements ItemWriter<SecurityQuote> {
 
                 securityQuoteRepository.save(newQuote);
             }
+
+            // 시가이력 테이블
+            SecurityPriceHistory history = new SecurityPriceHistory(newQuote.getSecurity(),
+                                                                    newQuote.getCurrentPrice(),
+                                                                    newQuote.getChangePrice(),
+                                                                    newQuote.getPercentageChange(),
+                                                                    newQuote.getVolume(),
+                                                                    newQuote.getQuotedAt());
+            securityPriceHistoryRepository.save(history);
         }
     }
 }
