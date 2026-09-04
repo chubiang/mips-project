@@ -15,18 +15,19 @@ React와 Spring Boot를 기반으로 프론트엔드와 백엔드를 분리하�
 - Google·Kakao OAuth2 로그인 연동
 - Spring Security 기반 JWT 발급·검증
 - Access Token과 Refresh Token 분리 관리
-- 미국 주식 정보 조회(Docker를 통해 로컬 n8n을 이용)
-- 사용자·계좌잔액·주식·주문 도메인 모델링
+- 미국 주식 정보 조회(Docker를 통해 로컬 n8n을 이용) = [2026.09.04 / 스케줄러로 변경, 비용문제로 n8n으론 로컬만 가능해서]
+- 사용자·계좌잔액·주식·주문 도메인 모델링 = [2026.09.02 / 주식 데이터 모델링 리펙토링]
 - Spring Boot 멀티 모듈 구조 구성
 - React 기반 기본 화면 및 라우팅 구성
-- PortOne 카카오페이 간편결제
+- PortOne 카카오페이 간편결제(테스트용 서버)
+- Docker 로컬에서 bootJar,Postgres 컨테이너 실행 테스트 완료
 
 ### 구현 예정
 - 일반 회원가입 및 로그인 API
 - 주식 매수·매도 주문 처리
 - 주문 체결 시 동시성 제어
 - 거래 내역 및 자산 현황 조회
-
+- 원화 달러 환율 조회 추가 (API 테스트는 완료)
 ---
 
 ## 기술 스택
@@ -35,7 +36,6 @@ React와 Spring Boot를 기반으로 프론트엔드와 백엔드를 분리하�
 - React
 - TypeScript
 - Vite
-- React Context API
 - ESLint
 
 ### Backend
