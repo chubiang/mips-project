@@ -21,6 +21,7 @@ React와 Spring Boot를 기반으로 프론트엔드와 백엔드를 분리하�
 - React 기반 기본 화면 및 라우팅 구성
 - PortOne 카카오페이 간편결제(테스트용 서버)
 - Docker 로컬에서 bootJar,Postgres 컨테이너 실행 테스트 완료
+- Finnhub사의 나스닥 웹소켓 통신 구현 완료
 
 ### 구현 예정
 - 일반 회원가입 및 로그인 API
