@@ -9,11 +9,8 @@ import com.mips.domain.payment.entity.Payment;
 import com.mips.domain.payment.enums.PaymentStatus;
 import com.mips.domain.user.entity.User;
 import com.mips.domain.user.repository.UserRepository;
-import com.mips.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -10,13 +10,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

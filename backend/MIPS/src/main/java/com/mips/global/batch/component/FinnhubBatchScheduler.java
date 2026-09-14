@@ -18,12 +18,15 @@ public class FinnhubBatchScheduler {
 
     private final JobLauncher jobLauncher;
     private final Job finnhubQuoteJob;
+    private final Job finnhubClosedQuoteJob;
 
     public FinnhubBatchScheduler(
             JobLauncher jobLauncher,
-            @Qualifier("finnhubQuoteJob") Job finnhubQuoteJob) {
+            @Qualifier("finnhubQuoteJob") Job finnhubQuoteJob,
+            @Qualifier("finnhubClosedQuoteJob") Job finnhubClosedQuoteJob) {
         this.jobLauncher = jobLauncher;
         this.finnhubQuoteJob = finnhubQuoteJob;
+        this.finnhubClosedQuoteJob = finnhubClosedQuoteJob;
     }
 
     @Scheduled(
@@ -43,5 +46,19 @@ public class FinnhubBatchScheduler {
         jobLauncher.run(finnhubQuoteJob, parameters);
     }
 
+    @Scheduled(
+            cron = "0 5 16 * * MON-FRI",
+            zone = "America/New_York"
+    )
+    public void runFinnhubQuoteClosed() throws Exception {
+        String runDate = LocalDateTime.now(ZoneId.of("America/New_York"))
+                .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        JobParameters parameters =
+                new JobParametersBuilder()
+                        .addString("runDate", runDate)
+                        .toJobParameters();
+
+        jobLauncher.run(finnhubClosedQuoteJob, parameters);
+    }
 
 }

@@ -1,12 +1,15 @@
 package com.mips.domain.order.entity;
 
-import com.mips.domain.stock.entity.SecurityMaster;
-import com.mips.domain.user.entity.User;
 import com.mips.domain.comm.entity.BaseTimeEntity;
 import com.mips.domain.order.enums.OrderStatus;
 import com.mips.domain.order.enums.OrderType;
+import com.mips.domain.stock.entity.SecurityMaster;
+import com.mips.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 

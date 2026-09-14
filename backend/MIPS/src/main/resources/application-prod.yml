@@ -39,7 +39,7 @@ spring:
             user-name-attribute: id
   data:
     redis:
-      host: redis
+      host: ${REDIS_HOST}
       port: 6379
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -84,6 +84,7 @@ koreaexim:
   secret: ${KOREAEXIM_SECRET}
 finnhub:
   api: ${FINNHUB_API}
+  websocket-url: ${FINNHUB_WEBSOCKET_URL}
   secret: ${FINNHUB_SECRET}
 nasdaq:
   top100-api: ${NSDAQ100_API}

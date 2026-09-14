@@ -1,13 +1,10 @@
 package com.mips.domain.account.dto;
 
+import com.mips.domain.comm.enums.Currency;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import com.mips.domain.comm.enums.Currency;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter

@@ -13,6 +13,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - mips-network
+  redis:
+    image: redis:8.10.1-alpine
 
   backend:
     build:
@@ -48,6 +50,7 @@ services:
       FINNHUB_SECRET: ${FINNHUB_SECRET}
       NSDAQ100_API: ${NSDAQ100_API}
       COOKIE_SAME_SITE: ${COOKIE_SAME_SITE}
+      REDIS_HOST: ${REDIS_HOST}
     ports:
       - "8081:8082"
     networks:

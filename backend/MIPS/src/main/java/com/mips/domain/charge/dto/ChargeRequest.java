@@ -1,6 +1,5 @@
 package com.mips.domain.charge.dto;
 
-import com.mips.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

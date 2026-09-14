@@ -5,7 +5,6 @@ import com.mips.domain.comm.enums.Currency;
 import com.mips.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 

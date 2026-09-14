@@ -4,7 +4,7 @@ import com.mips.domain.comm.dto.ExchangeRate;
 import com.mips.domain.comm.dto.KoreaEximExchangeRateResponse;
 import com.mips.domain.comm.enums.Currency;
 import com.mips.domain.comm.enums.ExchangeRateType;
-import com.mips.global.config.KoreaEximProperties;
+import com.mips.global.config.properties.KoreaEximProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;

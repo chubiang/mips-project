@@ -1,14 +1,12 @@
 package com.mips.domain.stock.controller;
 
-import com.mips.domain.comm.dto.ApiResponse;
-import com.mips.domain.stock.dto.StockResponse;
 import com.mips.domain.stock.entity.StockDetail;
 import com.mips.domain.stock.service.UsStockService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

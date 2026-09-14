@@ -1,9 +1,8 @@
 package com.mips.global.config;
 
-import com.mips.global.handler.OAuth2SuccessHandler;
 import com.mips.global.filter.JwtAuthenticationFilter;
+import com.mips.global.handler.OAuth2SuccessHandler;
 import com.mips.global.service.CustomOAuth2UserService;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

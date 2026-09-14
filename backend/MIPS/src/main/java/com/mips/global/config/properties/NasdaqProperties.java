@@ -1,4 +1,4 @@
-package com.mips.global.config;
+package com.mips.global.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;

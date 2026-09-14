@@ -7,7 +7,7 @@ import com.mips.domain.comm.enums.Currency;
 import com.mips.domain.comm.enums.ExchangeRateType;
 import com.mips.domain.comm.service.KoreaEximExchangeRateClient;
 import com.mips.domain.comm.utils.CurrencyCalculator;
-import com.mips.global.config.KoreaEximProperties;
+import com.mips.global.config.properties.KoreaEximProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,10 +21,10 @@ import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,7 +1,5 @@
 package com.mips.domain.user.service;
 
-import com.mips.domain.user.dto.SignupRequuest;
-import com.mips.domain.user.dto.SignupResponse;
 import com.mips.domain.user.entity.RefreshToken;
 import com.mips.domain.user.entity.User;
 import com.mips.domain.user.enums.TokenStatus;
@@ -18,7 +16,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service

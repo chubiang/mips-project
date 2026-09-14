@@ -1,8 +1,5 @@
 package com.mips.domain.stock.dto;
 
-import com.mips.domain.stock.entity.SecurityMaster;
-import com.mips.domain.stock.entity.SecurityQuote;
-
 import java.math.BigDecimal;
 
 public record FinnhubQuoteResponse(

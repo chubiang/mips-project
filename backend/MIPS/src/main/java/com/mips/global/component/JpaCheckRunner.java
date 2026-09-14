@@ -1,9 +1,9 @@
 package com.mips.global.component;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component

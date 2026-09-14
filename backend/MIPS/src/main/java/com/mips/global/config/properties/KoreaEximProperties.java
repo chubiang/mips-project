@@ -1,4 +1,4 @@
-package com.mips.global.config;
+package com.mips.global.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +8,8 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "portone.secret")
-public class PortOneSecretProperties {
-
-    private String storeId;
+@ConfigurationProperties(prefix = "koreaexim")
+public class KoreaEximProperties {
+    private String exchangeUrl;
     private String secret;
-    private String api;
-    private String webhook;
 }

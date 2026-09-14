@@ -8,10 +8,14 @@ import com.mips.domain.stock.entity.SecurityQuote;
 import com.mips.domain.stock.enums.Exchange;
 import com.mips.domain.stock.enums.SecurityType;
 import com.mips.domain.stock.repository.SecurityMasterRepository;
+import com.mips.global.exception.FinnhubRateLimitException;
+import com.mips.global.exception.FinnhubTemporaryException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -101,14 +105,32 @@ public class NasdaqSyncService {
         // 무료버전 사용중이라서 요청 갯수 제한때문에 5초 단위로 제한
         waitForRateLimit();
         log.info("Finnhub API 호출시작! - {}", securityMaster.getTicker());
-        // Finnhub에 ticker의 시가 조회
-        FinnhubQuoteResponse response = finnhubRestClient.get()
-                                                        .uri(uriBuilder -> uriBuilder
-                                                                .path("/api/v1/quote")
-                                                                .queryParam("symbol", securityMaster.getTicker())
-                                                                .build())
-                                                        .retrieve()
-                                                        .body(FinnhubQuoteResponse.class);
+        FinnhubQuoteResponse response;
+        try {
+            // Finnhub에 ticker의 시가 조회
+            response = finnhubRestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/api/v1/quote")
+                            .queryParam("symbol", securityMaster.getTicker())
+                            .build())
+                    .retrieve()
+                    .onStatus(
+                            status -> status.value() == 429,
+                            (req, res) -> {
+                                throw new FinnhubRateLimitException(
+                                        "Finnhub API rate limit exceeded: ticker="
+                                                + securityMaster.getTicker()
+                                );
+                            }
+                    )
+                    .onStatus(HttpStatusCode::is5xxServerError,
+                            (req, res) -> {
+                                throw new FinnhubTemporaryException("Finnhub 5XX ERROR");
+                            })
+                    .body(FinnhubQuoteResponse.class);
+        } catch (ResourceAccessException e) {
+            throw new FinnhubTemporaryException("Finnhub network error", e);
+        }
         if (response == null) {
             return null;
         }

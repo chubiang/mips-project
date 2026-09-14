@@ -16,16 +16,13 @@ import com.mips.domain.payment.entity.Payment;
 import com.mips.domain.payment.enums.PaymentStatus;
 import com.mips.domain.payment.enums.SelectedChannelType;
 import com.mips.domain.payment.repository.PaymentRepository;
-import com.mips.global.config.PortOneSecretProperties;
+import com.mips.global.config.properties.PortOneSecretProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-
-import java.util.Optional;
 
 @Slf4j
 @Service

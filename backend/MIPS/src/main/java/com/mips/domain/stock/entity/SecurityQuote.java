@@ -102,5 +102,13 @@ public class SecurityQuote extends BaseTimeEntity {
         this.volume = volume;
         this.quotedAt = quotedAt;
     }
+    public void updateLastPrice(BigDecimal currentPrice,
+                                Instant quotedAt) {
+        this.currentPrice = currentPrice;
+        this.quotedAt = LocalDateTime.ofInstant(
+                quotedAt,
+                ZoneId.of("Asia/Seoul")
+        );
 
+    }
 }

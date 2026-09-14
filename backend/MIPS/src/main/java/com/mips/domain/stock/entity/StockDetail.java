@@ -1,6 +1,5 @@
 package com.mips.domain.stock.entity;
 
-import com.mips.domain.stock.enums.SecurityType;
 import jakarta.persistence.*;
 import lombok.*;
 

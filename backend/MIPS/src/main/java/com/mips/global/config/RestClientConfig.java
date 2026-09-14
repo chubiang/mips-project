@@ -1,5 +1,9 @@
 package com.mips.global.config;
 
+import com.mips.global.config.properties.FinnhubProperties;
+import com.mips.global.config.properties.KoreaEximProperties;
+import com.mips.global.config.properties.NasdaqProperties;
+import com.mips.global.config.properties.PortOneSecretProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
