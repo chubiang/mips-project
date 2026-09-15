@@ -1,260 +1,167 @@
-import { useState, useMemo, useEffect, type ChangeEvent } from 'react'
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Clock, AlertCircle } from 'lucide-react'
-import { fetchAllUsStock } from '@/api/stockApi'
-import type {
-  UsTopStock,
-  StockFilter,
-  StockSort,
-  SortField,
-  AssetType,
-} from '@/types/Stock'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { AlertCircle, ArrowDown, ArrowUp, Clock, Radio, Search } from 'lucide-react'
+import { fetchRealtimeUsStocks, getRealtimeStockStreamUrl } from '@/api/stockApi'
+import type { RealtimeQuoteEvent, RealtimeStockQuote } from '@/types/Stock'
 
-// ---------------------------------------------------------------------------
-// Props 타입 정의
-// ---------------------------------------------------------------------------
-interface AssetTypeBadgeProps {
-  type: AssetType
+function formatPrice(value: number) {
+  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`
 }
 
-interface SortIconProps {
-  field: SortField
-  sort: StockSort
-}
-
-interface SortableHeaderProps {
-  label: string
-  field: SortField
-  sort: StockSort
-  onSort: (f: SortField) => void
-  className?: string
-}
-
-interface StockRowProps {
-  stock: UsTopStock
-  index: number
-}
-
-type FilterButton = {
-  label: string
-  value: StockFilter['assetType']
-}
-
-// ---------------------------------------------------------------------------
-// 유틸 함수
-// ---------------------------------------------------------------------------
-function formatPrice(v: number) {
-  return `$${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
-function formatUpdatedAt(iso: string) {
-  return new Date(iso).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit',
+function formatQuotedAt(value: string) {
+  return new Date(value).toLocaleString('ko-KR', {
+    month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
   })
 }
 
-// ---------------------------------------------------------------------------
-// 서브 컴포넌트
-// ---------------------------------------------------------------------------
-function AssetTypeBadge({ type }: AssetTypeBadgeProps) {
-  const styles: Record<AssetType, string> = {
-    STOCK: 'bg-blue-100 text-blue-600',
-    ETF:   'bg-green-100 text-green-700',
-    INDEX: 'bg-slate-100 text-slate-600',
-  }
-  const labels: Record<AssetType, string> = { STOCK: '주식', ETF: 'ETF', INDEX: '지수' }
-  return (
-    <span className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap ${styles[type]}`}>
-      {labels[type]}
-    </span>
-  )
-}
-
-function SortIcon({ field, sort }: SortIconProps) {
-  if (sort.field !== field) return <ChevronsUpDown size={14} className="text-slate-400" />
-  return sort.order === 'asc'
-    ? <ChevronUp size={14} className="text-blue-600" />
-    : <ChevronDown size={14} className="text-blue-600" />
-}
-
-function SortableHeader({
-  label, field, sort, onSort, className = '',
-}: SortableHeaderProps) {
-  return (
-    <th
-      className={`px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide cursor-pointer select-none hover:bg-slate-100 transition-colors ${className}`}
-      onClick={() => onSort(field)}
-    >
-      <div className="flex items-center gap-1">
-        {label}
-        <SortIcon field={field} sort={sort} />
-      </div>
-    </th>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// 메인 컴포넌트
-// ---------------------------------------------------------------------------
 export default function UsStock() {
-  const [data, setData] = useState<UsTopStock[] | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [quotes, setQuotes] = useState<RealtimeStockQuote[]>([])
+  const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [streamStatus, setStreamStatus] = useState<'connecting' | 'open' | 'error'>('connecting')
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<StockFilter>({ search: '', assetType: 'ALL' })
-  const [sort, setSort] = useState<StockSort>({ field: 'price', order: 'desc' })
 
   useEffect(() => {
-    fetchAllUsStock()
-      .then(setData)
-      .catch(() => setError('데이터를 불러오는 중 오류가 발생했습니다.'))
-      .finally(() => setLoading(false))
+    let active = true
+    let eventSource: EventSource | null = null
+
+    const connect = () => {
+      eventSource = new EventSource(getRealtimeStockStreamUrl())
+      eventSource.onopen = () => active && setStreamStatus('open')
+      eventSource.onerror = () => active && setStreamStatus('error')
+      eventSource.addEventListener('quote', event => {
+        if (!active) return
+
+        let update: RealtimeQuoteEvent
+        try {
+          update = JSON.parse(event.data) as RealtimeQuoteEvent
+        } catch {
+          setError('실시간 시세 메시지 형식이 올바르지 않습니다.')
+          return
+        }
+        setQuotes(current => {
+          const index = current.findIndex(quote => quote.ticker === update.ticker)
+          if (index < 0) {
+            return [...current, {
+              ...update,
+              companyName: update.ticker,
+              assetType: null,
+            }].sort((a, b) => a.ticker.localeCompare(b.ticker))
+          }
+
+          const next = [...current]
+          next[index] = { ...next[index], ...update }
+          return next
+        })
+      })
+    }
+
+    const initialize = async () => {
+      try {
+        const data = await fetchRealtimeUsStocks()
+        if (!active) return
+        setQuotes(Array.isArray(data) ? data : [])
+        setError(null)
+      } catch {
+        if (active) setError('실시간 시세를 불러오지 못했습니다.')
+      } finally {
+        if (active) {
+          setLoading(false)
+          connect()
+        }
+      }
+    }
+
+    void initialize()
+    return () => {
+      active = false
+      eventSource?.close()
+    }
   }, [])
 
-  const filtered = useMemo(() => {
-    if (!data) return []
-    let list = [...data]
+  const filteredQuotes = useMemo(() => {
+    const keyword = search.trim().toLowerCase()
+    if (!keyword) return quotes
+    return quotes.filter(quote =>
+      quote.ticker.toLowerCase().includes(keyword)
+      || quote.companyName.toLowerCase().includes(keyword),
+    )
+  }, [quotes, search])
 
-    if (filter.search) {
-      const q = filter.search.toLowerCase()
-      list = list.filter(
-        s =>
-          s.ticker.toLowerCase().includes(q) ||
-          s.companyName.toLowerCase().includes(q),
-      )
-    }
+  const latestQuotedAt = useMemo(() => {
+    if (!Array.isArray(quotes) || quotes.length === 0) return null
 
-    if (filter.assetType !== 'ALL') {
-      list = list.filter(s => s.assetType === filter.assetType)
-    }
+    return quotes.reduce<string | null>((latest, quote) => {
+      const quotedAtMillis = Date.parse(quote.quotedAt)
+      if (Number.isNaN(quotedAtMillis)) return latest
 
-    return list.sort((a, b) => {
-      const av = a[sort.field]
-      const bv = b[sort.field]
-      const dir = sort.order === 'asc' ? 1 : -1
-      return (typeof av === 'string' ? av.localeCompare(bv as string) : (av as number) - (bv as number)) * dir
-    })
-  }, [data, filter, sort])
-
-  function handleSort(field: SortField) {
-    setSort(prev => ({
-      field,
-      order: prev.field === field && prev.order === 'asc' ? 'desc' : 'asc',
-    }))
-  }
-
-  const filterButtons: FilterButton[] = [
-    { label: '전체',  value: 'ALL' },
-    { label: '주식',  value: 'STOCK' },
-    { label: 'ETF',   value: 'ETF' },
-  ]
-
-  const updatedAt = data?.[0]?.updatedAt
+      const latestMillis = latest ? Date.parse(latest) : Number.NEGATIVE_INFINITY
+      return quotedAtMillis > latestMillis ? quote.quotedAt : latest
+    }, null)
+  }, [quotes])
 
   return (
-    <div className="space-y-5">
-      {/* 페이지 헤더 */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <div className="space-y-5 text-left">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">미국 주식</h1>
-          <p className="text-sm text-slate-500 mt-0.5">시가총액 기준 상위 종목</p>
-        </div>
-        {updatedAt && (
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <Clock size={13} />
-            <span>최종 갱신: {formatUpdatedAt(updatedAt)}</span>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-slate-800">나스닥 실시간 시세</h1>
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">LIVE</span>
           </div>
-        )}
+          <p className="mt-1 text-sm text-slate-500">Finnhub 체결가 기준 · SSE 실시간 수신</p>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-slate-400">
+          <Radio size={13} className={streamStatus === 'open' ? 'text-emerald-500' : streamStatus === 'error' ? 'text-red-500' : 'animate-pulse'} />
+          <span>{streamStatus === 'open' ? '실시간 연결됨' : streamStatus === 'error' ? '재연결 중' : '연결 중'}</span>
+          <span>·</span>
+          {latestQuotedAt ? `최근 체결 ${formatQuotedAt(latestQuotedAt)}` : '시세 대기 중'}
+        </div>
       </div>
 
-      {/* 필터 바 */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
-            type="text"
-            placeholder="종목명 또는 종목코드 검색 (예: AAPL, Apple)"
-            value={filter.search}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setFilter(prev => ({ ...prev, search: e.target.value }))}
-            className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            type="search"
+            value={search}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+            placeholder="종목명 또는 티커 검색 (예: AAPL, Apple)"
+            className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-4 text-sm text-slate-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
-
-        <div className="flex gap-1.5">
-          {filterButtons.map(btn => (
-            <button
-              key={btn.value}
-              onClick={() => setFilter(prev => ({ ...prev, assetType: btn.value }))}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter.assetType === btn.value
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {btn.label}
-            </button>
-          ))}
         </div>
       </div>
 
-      {/* 결과 영역 */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        {!loading && !error && (
-          <div className="px-4 py-2.5 border-b border-slate-100 text-xs text-slate-500">
-            {filtered.length}개 종목
-            {(filter.search || filter.assetType !== 'ALL') && (
-              <button
-                onClick={() => setFilter({ search: '', assetType: 'ALL' })}
-                className="ml-2 text-blue-500 hover:underline"
-              >
-                필터 초기화
-              </button>
-            )}
-          </div>
-        )}
+      {error && (
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          <AlertCircle size={17} />
+          {error} 기존 시세가 있으면 마지막 값은 유지됩니다.
+        </div>
+      )}
 
-        {loading && (
-          <div className="flex items-center justify-center py-24 text-slate-400 text-sm">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent mr-3" />
-            데이터를 불러오는 중...
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-100 px-4 py-2.5 text-xs text-slate-500">{filteredQuotes.length}개 종목</div>
+        {loading ? (
+          <div className="flex items-center justify-center py-24 text-sm text-slate-400">
+            <div className="mr-3 h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+            실시간 시세를 불러오는 중...
           </div>
-        )}
-
-        {error && (
-          <div className="flex items-center justify-center gap-2 py-24 text-red-500 text-sm">
-            <AlertCircle size={18} />
-            {error}
+        ) : filteredQuotes.length === 0 ? (
+          <div className="py-20 text-center text-sm text-slate-400">
+            {search ? '검색 결과가 없습니다.' : 'Redis에 수신된 실시간 시세가 없습니다.'}
           </div>
-        )}
-
-        {!loading && !error && (
+        ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-[640px] w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+            <table className="w-full min-w-[620px] text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide w-10">#</th>
-                  <SortableHeader label="종목코드" field="ticker"      sort={sort} onSort={handleSort} className="w-20" />
-                  <SortableHeader label="종목명"   field="companyName" sort={sort} onSort={handleSort} className="min-w-[140px]" />
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide hidden sm:table-cell w-16">구분</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide hidden lg:table-cell">섹터</th>
-                  <SortableHeader label="현재가"   field="price"        sort={sort} onSort={handleSort} className="text-right" />
-                  <SortableHeader label="전일대비"  field="changeRate"   sort={sort} onSort={handleSort} className="text-right" />
-                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide hidden md:table-cell">시가</th>
-                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide hidden xl:table-cell whitespace-nowrap">고가 / 저가</th>
-                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide hidden md:table-cell whitespace-nowrap">전일종가</th>
+                  <th className="px-4 py-3 text-left">티커</th>
+                  <th className="px-4 py-3 text-left">종목명</th>
+                  <th className="px-4 py-3 text-left">구분</th>
+                  <th className="px-4 py-3 text-right">현재 체결가</th>
+                  <th className="px-4 py-3 text-right">체결 시각</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="py-16 text-center text-slate-400 text-sm">
-                      검색 결과가 없습니다.
-                    </td>
-                  </tr>
-                ) : (
-                  filtered.map((stock, idx) => (
-                    <StockRow key={stock.ticker} stock={stock} index={idx + 1} />
-                  ))
-                )}
+                {filteredQuotes.map(quote => <RealtimeStockRow key={quote.ticker} quote={quote} />)}
               </tbody>
             </table>
           </div>
@@ -264,34 +171,50 @@ export default function UsStock() {
   )
 }
 
-function StockRow({ stock, index }: StockRowProps) {
-  const isPositive = stock.changeAmount >= 0
-  const changeColor = isPositive ? 'text-green-600' : 'text-red-500'
-  const changeSign  = isPositive ? '+' : ''
+function RealtimeStockRow({ quote }: { quote: RealtimeStockQuote }) {
+  const previousPrice = useRef(quote.currentPrice)
+  const [direction, setDirection] = useState<'up' | 'down' | null>(null)
+
+  useEffect(() => {
+    const previous = previousPrice.current
+    previousPrice.current = quote.currentPrice
+    if (quote.currentPrice === previous) return
+
+    setDirection(quote.currentPrice > previous ? 'up' : 'down')
+    const timer = window.setTimeout(() => setDirection(null), 900)
+    return () => window.clearTimeout(timer)
+  }, [quote.currentPrice])
+
+  const highlight = direction === 'up'
+    ? 'bg-emerald-50'
+    : direction === 'down'
+      ? 'bg-red-50'
+      : ''
+  const priceColor = direction === 'up'
+    ? 'text-emerald-600'
+    : direction === 'down'
+      ? 'text-red-500'
+      : 'text-slate-900'
 
   return (
-    <tr className="hover:bg-slate-50 transition-colors">
-      <td className="px-3 py-2 text-slate-400 text-xs">{index}</td>
-      <td className="px-3 py-2 font-bold text-slate-800 font-mono whitespace-nowrap">{stock.ticker}</td>
-      <td className="px-3 py-2 text-slate-700">
-        <span className="block max-w-[200px] truncate">{stock.companyName}</span>
+    <tr className={`${highlight} transition-colors duration-700 hover:bg-slate-50`}>
+      <td className="px-4 py-3 font-mono font-bold text-slate-800">{quote.ticker}</td>
+      <td className="px-4 py-3 text-slate-700">{quote.companyName}</td>
+      <td className="px-4 py-3">
+        <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
+          {quote.assetType ?? '미분류'}
+        </span>
       </td>
-      <td className="px-3 py-2 hidden sm:table-cell">
-        <AssetTypeBadge type={stock.assetType} />
+      <td className={`px-4 py-3 text-right font-semibold tabular-nums transition-colors ${priceColor}`}>
+        <span className="inline-flex items-center justify-end gap-1">
+          {direction === 'up' && <ArrowUp size={14} />}
+          {direction === 'down' && <ArrowDown size={14} />}
+          {formatPrice(quote.currentPrice)}
+        </span>
       </td>
-      <td className="px-3 py-2 text-slate-500 hidden lg:table-cell">{stock.sector}</td>
-      <td className="px-3 py-2 text-right font-semibold text-slate-800 whitespace-nowrap">{formatPrice(stock.price)}</td>
-      <td className={`px-3 py-2 text-right font-medium whitespace-nowrap ${changeColor}`}>
-        <div>{changeSign}{formatPrice(stock.changeAmount)}</div>
-        <div className="text-xs">{changeSign}{stock.changeRate.toFixed(2)}%</div>
+      <td className="px-4 py-3 text-right text-xs text-slate-500">
+        <span className="inline-flex items-center gap-1"><Clock size={12} />{formatQuotedAt(quote.quotedAt)}</span>
       </td>
-      <td className="px-3 py-2 text-right text-slate-600 whitespace-nowrap hidden md:table-cell">{formatPrice(stock.openPrice)}</td>
-      <td className="px-3 py-2 text-right text-slate-600 whitespace-nowrap hidden xl:table-cell">
-        <span className="text-green-600">{formatPrice(stock.highPrice)}</span>
-        <span className="text-slate-300 mx-1">/</span>
-        <span className="text-red-500">{formatPrice(stock.lowPrice)}</span>
-      </td>
-      <td className="px-3 py-2 text-right text-slate-600 whitespace-nowrap hidden md:table-cell">{formatPrice(stock.prevClose)}</td>
     </tr>
   )
 }

@@ -1,7 +1,6 @@
 import requestApi  from "@/api/requestApi"
 import type { ChargeRequest, ChargeResponse, PortoneResponse } from "@/types/Charge"
 import type { AccountInfo } from "@/types/Asset"
-import type { ApiResponse } from "@/types/Comm"
 
 // 충전요청 처리 API 호출   
 export const handleReqCharge = async (charge: ChargeRequest): Promise<ChargeResponse | null> => {

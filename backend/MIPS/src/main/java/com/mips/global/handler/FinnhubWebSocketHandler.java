@@ -36,7 +36,7 @@ public class FinnhubWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info("FinnhubWebsocketHandler handleTextMessage {}", message.getPayload());
+        log.debug("FinnhubWebsocketHandler handleTextMessage {}", message.getPayload());
         FinnhubTradeResponse response = objectMapper.readValue(message.getPayload(), FinnhubTradeResponse.class);
         if (response == null
                 || !"trade".equals(response.type())

@@ -39,6 +39,9 @@ public class RedisQuoteStore {
     public List<RealtimeQuoteCache> findAllLatest() {
         Set<String> keys = redisTemplate.keys(KEY_PREFIX + "*");
         List<RealtimeQuoteCache> result = new ArrayList<>();
+        if (keys == null || keys.isEmpty()) {
+            return result;
+        }
         try {
             for (String key : keys) {
                 String value = redisTemplate.opsForValue().get(key);

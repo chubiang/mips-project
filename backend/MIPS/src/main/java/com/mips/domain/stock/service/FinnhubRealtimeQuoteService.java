@@ -12,6 +12,7 @@ import java.time.Instant;
 public class FinnhubRealtimeQuoteService {
 
     private final RedisQuoteStore redisQuoteStore;
+    private final RealtimeQuoteSseService realtimeQuoteSseService;
 
     public void saveLatestPrice(FinnhubTradeData data) {
         if (data.s() == null || data.p() == null || data.t() == null) {
@@ -25,5 +26,6 @@ public class FinnhubRealtimeQuoteService {
         );
 
         redisQuoteStore.save(quote);
+        realtimeQuoteSseService.publish(quote);
     }
 }

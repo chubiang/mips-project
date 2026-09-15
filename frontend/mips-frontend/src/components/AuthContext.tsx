@@ -3,7 +3,6 @@ import { setTokenToWorker } from '@/api/authWorkerClient'
 import { AuthContext } from '@/contexts/AuthContext'
 import { handleLogout } from '@/api/userApi'
 import requestApi from '@/api/requestApi'
-import type { ApiResponse } from '@/types/Comm'
 
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -18,16 +17,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // silentRefresh를 requestApi 호출 전에 선언 (TS2448 방지)
     const silentRefresh = async (): Promise<void> => {
       try {
-        const response = await requestApi({
+        const response = await requestApi<{ token: string }>({
           url: '/api/auth/refresh',
           method: 'POST',
           withCredentials: true,
         })
 
-        if (response.status >= 200 && response.status < 300) {
-          const resdata = response.data as ApiResponse<{ token: string }>
-          console.log("silentRefresh",response, resdata)
-          await setTokenToWorker(resdata.data.token)
+        if (response.success) {
+          console.log("silentRefresh", response)
+          await setTokenToWorker(response.data.token)
           setIsLoggedIn(true)
           console.log("새로고침 방어 성공! 토큰 복구됨")
         } else {

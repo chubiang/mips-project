@@ -18,6 +18,20 @@ export interface UsTopStock {
   updatedAt: string    // ISO 8601
 }
 
+export interface RealtimeStockQuote {
+  ticker: string
+  companyName: string
+  assetType: 'STOCK' | 'ETF' | null
+  currentPrice: number
+  quotedAt: string
+}
+
+export interface RealtimeQuoteEvent {
+  ticker: string
+  currentPrice: number
+  quotedAt: string
+}
+
 export type SortField = 'ticker' | 'companyName' | 'price' | 'changeAmount' | 'changeRate'
 export type SortOrder = 'asc' | 'desc'
 
