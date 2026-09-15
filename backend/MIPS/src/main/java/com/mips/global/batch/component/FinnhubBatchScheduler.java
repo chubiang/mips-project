@@ -29,22 +29,22 @@ public class FinnhubBatchScheduler {
         this.finnhubClosedQuoteJob = finnhubClosedQuoteJob;
     }
 
-    @Scheduled(
-            cron = "${batch.finnhub.cron}",
-            zone = "Asia/Seoul"
-    )
-    public void runFinnhubQuote() throws Exception {
-        String runDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
-                                            .truncatedTo(ChronoUnit.MINUTES)
-                                            .format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
-
-        JobParameters parameters =
-                new JobParametersBuilder()
-                        .addString("runDateTime", runDateTime)
-                        .toJobParameters();
-
-        jobLauncher.run(finnhubQuoteJob, parameters);
-    }
+//    @Scheduled(
+//            cron = "${batch.finnhub.cron}",
+//            zone = "Asia/Seoul"
+//    )
+//    public void runFinnhubQuote() throws Exception {
+//        String runDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
+//                                            .truncatedTo(ChronoUnit.MINUTES)
+//                                            .format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+//
+//        JobParameters parameters =
+//                new JobParametersBuilder()
+//                        .addString("runDateTime", runDateTime)
+//                        .toJobParameters();
+//
+//        jobLauncher.run(finnhubQuoteJob, parameters);
+//    }
 
     @Scheduled(
             cron = "0 5 16 * * MON-FRI",
