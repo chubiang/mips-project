@@ -12,16 +12,8 @@ export default function AssetMng() {
   const [totalKrw] = useState<number>(0)
 
   useEffect(() => {
-    // fetch("/api/asset/holdings")
-    //   .then((res) => {
-    //     if (!res.ok) throw new Error("Failed to fetch holdings")
-    //     return res.json()
-    //   })
-    //   .then((data: HoldingStock[]) => setHoldings(data))
-    //   .catch((err) => {
-    //     setHoldings([])
-    //     console.error("Failed to fetch holdings:", err)
-    //   })
+    // 자산조회(기본-국내로)
+    chgMarket("KR")
   }, [])
 
   const filteredHoldings = holdings.filter((h) => h.market === market)
