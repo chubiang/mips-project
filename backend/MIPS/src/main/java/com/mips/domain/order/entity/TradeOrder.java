@@ -1,6 +1,8 @@
 package com.mips.domain.order.entity;
 
+import com.mips.domain.account.entity.Account;
 import com.mips.domain.comm.entity.BaseTimeEntity;
+import com.mips.domain.order.enums.OrderMethod;
 import com.mips.domain.order.enums.OrderStatus;
 import com.mips.domain.order.enums.OrderType;
 import com.mips.domain.stock.entity.SecurityMaster;
@@ -11,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -28,6 +31,10 @@ public class TradeOrder extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)
     private SecurityMaster securityMaster;
 
@@ -35,11 +42,24 @@ public class TradeOrder extends BaseTimeEntity {
     @Column(name = "order_type", nullable = false, length = 10)
     private OrderType orderType;
 
-    @Column(nullable = false, precision = 19, scale = 4)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_method", nullable = false, length = 10)
+    private OrderMethod orderMethod;
+
+    @Column(precision = 19, scale = 4)
     private BigDecimal price;
 
     @Column(nullable = false)
     private Long quantity;
+
+    @Column(name = "executed_price", precision = 19, scale = 4)
+    private BigDecimal executedPrice;
+
+    @Column(name = "executed_quantity", nullable = false)
+    private Long executedQuantity = 0L;
+
+    @Column(name = "executed_at")
+    private LocalDateTime executedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
