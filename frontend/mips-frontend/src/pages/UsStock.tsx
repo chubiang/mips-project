@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
-import { AlertCircle, ArrowDown, ArrowUp, Clock, Radio, Search } from 'lucide-react'
-import { fetchRealtimeUsStocks, getRealtimeStockStreamUrl } from '@/api/stockApi'
-import type { RealtimeQuoteEvent, RealtimeStockQuote } from '@/types/Stock'
+import { AlertCircle, ArrowDown, ArrowUp, Clock, RefreshCcw, Radio, Search } from 'lucide-react'
+import { fetchRealtimeUsStocks, getRealtimeStockStreamUrl, getStockListUrl } from '@/api/stockApi'
+import type { RealtimeQuoteEvent, RealtimeStockQuote, Source } from '@/types/Stock'
 
 function formatPrice(value: number) {
   return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`
@@ -17,7 +17,8 @@ export default function UsStock() {
   const [quotes, setQuotes] = useState<RealtimeStockQuote[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
-  const [streamStatus, setStreamStatus] = useState<'connecting' | 'open' | 'error'>('connecting')
+  const [refreshKey, setRefreshKey] = useState(false)
+  const [streamStatus, setStreamStatus] = useState<'connecting' | 'open' | 'error' | 'closed'>('connecting')
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function UsStock() {
             return [...current, {
               ...update,
               companyName: update.ticker,
-              assetType: null,
+              assetType: null
             }].sort((a, b) => a.ticker.localeCompare(b.ticker))
           }
 
@@ -59,10 +60,17 @@ export default function UsStock() {
       try {
         const data = await fetchRealtimeUsStocks()
         if (!active) return
+        else if (data.length === 0) {
+          throw new Error('실시간 시세가 없습니다. Redis에 수신된 시세가 없거나, 백엔드가 구버전일 수 있습니다.')
+        }
         setQuotes(Array.isArray(data) ? data : [])
         setError(null)
       } catch {
-        if (active) setError('실시간 시세를 불러오지 못했습니다.')
+        const stockList = await fetchStockListUrl()
+        if (!active) return
+        setQuotes(stockList)
+        setError('실시간 시세를 불러오지 못했습니다. 기록된 장마감 시세로 조회됩니다.')
+        setStreamStatus('closed')
       } finally {
         if (active) {
           setLoading(false)
@@ -71,12 +79,16 @@ export default function UsStock() {
       }
     }
 
+    const fetchStockListUrl = async () => {
+      return await getStockListUrl()
+    }
+
     void initialize()
     return () => {
       active = false
       eventSource?.close()
     }
-  }, [])
+  }, [refreshKey])
 
   const filteredQuotes = useMemo(() => {
     const keyword = search.trim().toLowerCase()
@@ -107,11 +119,15 @@ export default function UsStock() {
             <h1 className="text-2xl font-bold text-slate-800">나스닥 실시간 시세</h1>
             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">LIVE</span>
           </div>
-          <p className="mt-1 text-sm text-slate-500">Finnhub 체결가 기준 · SSE 실시간 수신</p>
+          <p className="flex mt-1 text-sm text-slate-500">Finnhub 체결가 기준 · SSE 실시간 수신 
+            <button onClick={() => setRefreshKey(prev => !prev)} className="ml-1 cursor-pointer text-emerald-500 hover:text-emerald-600">
+              <RefreshCcw size={16} />
+            </button>
+          </p>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <Radio size={13} className={streamStatus === 'open' ? 'text-emerald-500' : streamStatus === 'error' ? 'text-red-500' : 'animate-pulse'} />
-          <span>{streamStatus === 'open' ? '실시간 연결됨' : streamStatus === 'error' ? '재연결 중' : '연결 중'}</span>
+          <span>{streamStatus === 'open' ? '실시간 연결됨' : streamStatus === 'error' ? '재연결 중' : streamStatus === 'closed' ? '연결 끊김' : '연결 중'}</span>
           <span>·</span>
           {latestQuotedAt ? `최근 체결 ${formatQuotedAt(latestQuotedAt)}` : '시세 대기 중'}
         </div>
@@ -133,7 +149,7 @@ export default function UsStock() {
       {error && (
         <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
           <AlertCircle size={17} />
-          {error} 기존 시세가 있으면 마지막 값은 유지됩니다.
+          {error} {!error && '기존 시세가 있으면 마지막 값은 유지됩니다.'}
         </div>
       )}
 

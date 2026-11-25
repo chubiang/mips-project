@@ -107,10 +107,11 @@ public class FinnhubWebSocketConnectionManager {
             for (SecurityMaster securityMaster : targetTickers) {
                 if (cnt >= 5) break;
                 sendSubscription(securityMaster.getTicker());
+                log.info("Finnhub WebSocket 연결 및 구독 신청: {}", securityMaster.getTicker());
                 cnt++;
             }
             retrySeconds = 1;
-            log.info("Finnhub WebSocket 연결 및 구독 요청 완료: {}", targetTickers);
+            log.info("Finnhub WebSocket 연결 및 구독 요청 완료");
         } catch (IOException | RuntimeException e) {
             disconnectAndRetry();
         }

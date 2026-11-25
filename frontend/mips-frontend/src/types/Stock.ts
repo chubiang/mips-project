@@ -1,6 +1,7 @@
 // src/types/Stock.ts
 
 export type AssetType = 'STOCK' | 'ETF' | 'INDEX'
+export type Source = 'REALTIME' | 'SNAPSHOT'
 
 export interface UsTopStock {
   ticker: string
@@ -24,6 +25,7 @@ export interface RealtimeStockQuote {
   assetType: 'STOCK' | 'ETF' | null
   currentPrice: number
   quotedAt: string
+  source: Source | null
 }
 
 export interface RealtimeQuoteEvent {

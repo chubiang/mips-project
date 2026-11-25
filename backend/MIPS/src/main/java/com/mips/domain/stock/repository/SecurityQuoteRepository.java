@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SecurityQuoteRepository extends JpaRepository<SecurityQuote, Long> {
@@ -18,5 +19,7 @@ public interface SecurityQuoteRepository extends JpaRepository<SecurityQuote, Lo
             """)
     Optional<SecurityQuote> findByTickerAndExchange(@Param("ticker") String ticker,
                                                     @Param("exchange") Exchange exchange);
+
+    List<SecurityQuote> findAllBySecurity_ExchangeAndSecurity_IsActiveTrue(Exchange exchange);
 
 }

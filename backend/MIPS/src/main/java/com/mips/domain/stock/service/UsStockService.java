@@ -1,17 +1,22 @@
 package com.mips.domain.stock.service;
 
+import com.mips.domain.stock.entity.SecurityQuote;
 import com.mips.domain.stock.entity.StockDetail;
 import com.mips.domain.stock.dto.RealtimeQuoteCache;
 import com.mips.domain.stock.dto.RealtimeStockResponse;
 import com.mips.domain.stock.entity.SecurityMaster;
 import com.mips.domain.stock.enums.Exchange;
+import com.mips.domain.stock.enums.Source;
 import com.mips.domain.stock.repository.SecurityMasterRepository;
+import com.mips.domain.stock.repository.SecurityQuoteRepository;
 import com.mips.domain.stock.repository.StockDetailRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,15 +31,18 @@ public class UsStockService implements StockService{
 
     private final StockDetailRepository stockDetailRepository;
     private final SecurityMasterRepository securityMasterRepository;
+    private final SecurityQuoteRepository securityQuoteRepository;
     private final RedisQuoteStore redisQuoteStore;
 
     public UsStockService(EntityManager entityManager,
                           StockDetailRepository stockDetailRepository,
                           SecurityMasterRepository securityMasterRepository,
+                          SecurityQuoteRepository securityQuoteRepository,
                           RedisQuoteStore redisQuoteStore) {
         this.entityManager = entityManager;
         this.stockDetailRepository = stockDetailRepository;
         this.securityMasterRepository = securityMasterRepository;
+        this.securityQuoteRepository = securityQuoteRepository;
         this.redisQuoteStore = redisQuoteStore;
     }
 
@@ -64,6 +72,20 @@ public class UsStockService implements StockService{
                 .toList();
     }
 
+    public List<RealtimeStockResponse> findAllQuotes() {
+        List<SecurityQuote> securityQuotes = securityQuoteRepository.findAllBySecurity_ExchangeAndSecurity_IsActiveTrue(Exchange.NASDAQ);
+        return securityQuotes
+                .stream()
+                .map(quote -> new RealtimeStockResponse(quote.getSecurity().getTicker(),
+                                                                    quote.getSecurity().getName(),
+                                                                    quote.getSecurity().getSecurityType(),
+                                                                    quote.getCurrentPrice(),
+                                                                    quote.getQuotedAt().atZone(ZoneId.of("Asia/Seoul")).toInstant(),
+                                                                    Source.SNAPSHOT
+                                                                    ))
+                .toList();
+    }
+
     private RealtimeStockResponse toRealtimeResponse(
             RealtimeQuoteCache quote,
             SecurityMaster security
@@ -73,7 +95,8 @@ public class UsStockService implements StockService{
                 security == null ? quote.ticker() : security.getName(),
                 security == null ? null : security.getSecurityType(),
                 quote.currentPrice(),
-                quote.quotedAt()
+                quote.quotedAt(),
+                Source.REALTIME
         );
     }
 

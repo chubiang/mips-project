@@ -33,3 +33,21 @@ export async function fetchRealtimeUsStocks(): Promise<RealtimeStockQuote[]> {
 
   throw new Error('실시간 시세 API 응답 형식이 올바르지 않습니다.');
 }
+
+export async function getStockListUrl() {
+  const response = await requestApi({
+    url: '/api/stock/us/list',
+    method: 'GET'
+  });
+  
+  if (Array.isArray(response)) {
+    return response as RealtimeStockQuote[];
+  }
+
+  if (Array.isArray(response.data)) {
+    return response.data;
+  }
+  
+  throw new Error('주식 목록 API 응답 형식이 올바르지 않습니다.');
+}
+

@@ -44,3 +44,6 @@ src/test/resources/**
 src/test/resources/*.properties
 src/main/resources/application-local.yml
 .env
+
+# AI test
+.site-work/**

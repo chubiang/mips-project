@@ -29,6 +29,10 @@ public class UsStockController {
         return usStockService.findByTicker(ticker);
     }
 
+    /**
+     * Redis에 저장되어있는 시세로 조회
+     * @return
+     */
     @GetMapping("/realtime")
     public ApiResponse<List<RealtimeStockResponse>> getRealtimeQuotes() {
         return ApiResponse.success(usStockService.findAllRealtimeQuotes());
@@ -38,12 +42,14 @@ public class UsStockController {
     public SseEmitter streamRealtimeQuotes() {
         return realtimeQuoteSseService.subscribe();
     }
-//    @GetMapping("/all")
-//    public List<StockResponse> getAllStocks() {
-//        List<StockDetail> list = usStockService.findAll();
-//        return list.stream()
-//                   .map(StockResponse::new)
-//                   .toList();
-//    }
+ 
+    /**
+     * DB에 저장되어있는 시세로 조회
+     * @return
+     */
+    @GetMapping("/list")
+    public ApiResponse<List<RealtimeStockResponse>> findAllQuotes() {
+        return ApiResponse.success(usStockService.findAllQuotes());
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.mips.domain.stock.dto;
 
 import com.mips.domain.stock.enums.SecurityType;
+import com.mips.domain.stock.enums.Source;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -10,6 +11,7 @@ public record RealtimeStockResponse(
         String companyName,
         SecurityType assetType,
         BigDecimal currentPrice,
-        Instant quotedAt
+        Instant quotedAt,
+        Source source
 ) {
 }
